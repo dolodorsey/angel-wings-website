@@ -1,18 +1,18 @@
 'use client'
+
 import { useEffect } from 'react'
 
 export default function Home() {
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible')
-        }
-      })
-    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' })
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
-
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible')
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+    )
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
     const handleMouseMove = (e: MouseEvent) => {
       const halo = document.querySelector('.hero-halo') as HTMLElement
       if (!halo) return
@@ -20,176 +20,64 @@ export default function Home() {
       const y = (e.clientY / window.innerHeight - 0.5) * 20
       halo.style.transform = `translateX(calc(-50% + ${x}px)) translateY(${y}px)`
     }
-
     window.addEventListener('mousemove', handleMouseMove)
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('mousemove', handleMouseMove)
-    }
+    return () => { observer.disconnect(); window.removeEventListener('mousemove', handleMouseMove) }
   }, [])
+
+  const drops = [
+    { name: 'The Halo Box', hook: '12 wings \u00b7 2 sauces \u00b7 the full ritual', bg: 'linear-gradient(135deg, #1a0a0a 0%, #2a1515 50%, #1a0808 100%)' },
+    { name: 'The Heat Collection', hook: 'For those who worship the burn', bg: 'linear-gradient(135deg, #1a0f00 0%, #2a1a08 50%, #1a0800 100%)' },
+    { name: 'Tenders & Testimony', hook: 'Crisp. Golden. Undeniable.', bg: 'linear-gradient(135deg, #0a0a1a 0%, #151525 50%, #0a0a15 100%)' },
+    { name: 'Loaded Fry Ritual', hook: 'Sauce. Cheese. No restraint.', bg: 'linear-gradient(135deg, #1a1000 0%, #2a1a05 50%, #1a0d00 100%)' },
+    { name: 'Signature Sauce Vault', hook: '7 worlds. One obsession.', bg: 'linear-gradient(135deg, #0d0a0a 0%, #1a1212 50%, #100a0a 100%)' },
+    { name: 'Family Feast Drops', hook: 'Feed the whole crew. Own the night.', bg: 'linear-gradient(135deg, #0f0808 0%, #1f1212 50%, #0f0808 100%)' },
+  ]
+  const flavors = [
+    { name: 'Holy Heat', heat: '\ud83d\udd25\ud83d\udd25\ud83d\udd25\ud83d\udd25' },
+    { name: 'Sweet Salvation', heat: '\ud83d\udd25' },
+    { name: 'Garlic Glory', heat: '\ud83d\udd25\ud83d\udd25' },
+    { name: 'Lemon Praise', heat: '\ud83d\udd25' },
+    { name: 'BBQ Baptism', heat: '\ud83d\udd25\ud83d\udd25' },
+    { name: 'Mild Mercy', heat: '\u2014' },
+    { name: 'Inferno Revival', heat: '\ud83d\udd25\ud83d\udd25\ud83d\udd25\ud83d\udd25\ud83d\udd25' },
+  ]
+  const perks = [
+    { title: 'First Order Reward', desc: 'Welcome bonus on your inaugural box.' },
+    { title: 'VIP Flavor Drops', desc: 'Early access to limited sauces and seasonal heat.' },
+    { title: 'Surprise Add-Ons', desc: 'Random bonus items in qualifying orders.' },
+    { title: 'Birthday Perks', desc: 'Free box on your day. No catch.' },
+  ]
 
   return (
     <>
       <style jsx global>{`
-        :root {
-          --black: #0A0A0A;
-          --deep-black: #050505;
-          --crimson: #8B1A1A;
-          --crimson-glow: #C62828;
-          --amber: #D4A04A;
-          --amber-light: #E8C06A;
-          --cream: #F5F0E8;
-          --chrome: #C0C0C0;
-          --font-display: 'Playfair Display', Georgia, serif;
-          --font-body: 'DM Sans', system-ui, sans-serif;
-          --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
-          --ease-smooth: cubic-bezier(0.37, 0, 0.63, 1);
-          --text-hero: clamp(56px, 11vw, 160px);
-          --text-section: clamp(32px, 5.5vw, 72px);
-          --text-body-lg: clamp(14px, 1.3vw, 18px);
-          --text-body: clamp(13px, 1.1vw, 15px);
-          --text-caption: clamp(9px, 0.85vw, 11px);
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior: smooth; }
-        body { background:var(--deep-black); color:var(--cream); font-family:var(--font-body); font-weight:300; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
-        body::after { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:9999; }
-        .reveal { opacity:0; transform:translateY(50px); transition:opacity 0.8s var(--ease-expo), transform 0.8s var(--ease-expo); }
-        .reveal.visible { opacity:1; transform:translateY(0); }
-        .reveal-delay-1{transition-delay:0.1s} .reveal-delay-2{transition-delay:0.2s} .reveal-delay-3{transition-delay:0.3s} .reveal-delay-4{transition-delay:0.4s} .reveal-delay-5{transition-delay:0.5s}
-        @keyframes revealUp { to{opacity:1;transform:translateY(0)} }
-        @keyframes beamPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
-        @keyframes haloGlow { 0%,100%{opacity:0.4;box-shadow:0 0 60px rgba(212,160,74,0.05)} 50%{opacity:1;box-shadow:0 0 120px rgba(212,160,74,0.12)} }
-        @keyframes particleRise { 0%{transform:translateY(0) scale(1);opacity:0} 10%{opacity:0.6} 90%{opacity:0} 100%{transform:translateY(-400px) scale(0.3);opacity:0} }
+        :root{--black:#0A0A0A;--deep-black:#050505;--crimson:#8B1A1A;--crimson-glow:#C62828;--amber:#D4A04A;--amber-light:#E8C06A;--cream:#F5F0E8;--chrome:#C0C0C0;--font-display:'Playfair Display',Georgia,serif;--font-body:'DM Sans',system-ui,sans-serif;--ease-expo:cubic-bezier(0.16,1,0.3,1);--ease-smooth:cubic-bezier(0.37,0,0.63,1);--text-hero:clamp(56px,11vw,160px);--text-section:clamp(32px,5.5vw,72px);--text-body-lg:clamp(14px,1.3vw,18px);--text-caption:clamp(9px,0.85vw,11px)}*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--deep-black);color:var(--cream);font-family:var(--font-body);font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+        nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}.nav-logo{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cream)}.nav-logo span{color:var(--amber)}.nav-links{display:flex;gap:32px;list-style:none}.nav-links a{color:var(--cream);text-decoration:none;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:400;opacity:.7;transition:opacity .3s}.nav-links a:hover{opacity:1}
+        .hero{position:relative;height:100vh;min-height:700px;display:flex;flex-direction:column;justify-content:flex-end;padding:0 48px 80px;overflow:hidden}.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 65% 40%,rgba(212,160,74,.12) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 30% 70%,rgba(139,26,26,.15) 0%,transparent 60%),radial-gradient(circle at 50% 0%,rgba(212,160,74,.06) 0%,transparent 50%),linear-gradient(180deg,var(--deep-black) 0%,#0D0808 50%,var(--deep-black) 100%)}.hero-beam{position:absolute;top:-20%;left:55%;width:200px;height:140%;background:linear-gradient(180deg,rgba(212,160,74,.08) 0%,rgba(212,160,74,.03) 40%,transparent 80%);transform:rotate(-8deg);filter:blur(40px);animation:beamPulse 6s var(--ease-smooth) infinite}.hero-beam-2{left:35%;width:120px;opacity:.5;transform:rotate(5deg);animation-delay:-3s}@keyframes beamPulse{0%,100%{opacity:.6}50%{opacity:1}}
+        .hero-halo{position:absolute;top:18%;left:50%;transform:translateX(-50%);width:clamp(200px,30vw,400px);height:clamp(200px,30vw,400px);border:1px solid rgba(212,160,74,.15);border-radius:50%;animation:haloGlow 4s var(--ease-smooth) infinite}.hero-halo::after{content:'';position:absolute;inset:-20px;border:1px solid rgba(212,160,74,.06);border-radius:50%}@keyframes haloGlow{0%,100%{opacity:.4;box-shadow:0 0 60px rgba(212,160,74,.05)}50%{opacity:1;box-shadow:0 0 120px rgba(212,160,74,.12)}}
+        .particle{position:absolute;width:2px;height:2px;background:rgba(212,160,74,.3);border-radius:50%;animation:particleRise 8s linear infinite}@keyframes particleRise{0%{transform:translateY(0) scale(1);opacity:0}10%{opacity:.6}90%{opacity:0}100%{transform:translateY(-400px) scale(.3);opacity:0}}
+        .hero-content{position:relative;z-index:2;max-width:900px}.hero-tag{font-size:var(--text-caption);letter-spacing:.5em;text-transform:uppercase;color:var(--amber);margin-bottom:24px;opacity:0;transform:translateY(30px);animation:revealUp .8s var(--ease-expo) .3s forwards}.hero h1{font-family:var(--font-display);font-size:var(--text-hero);font-weight:900;line-height:.9;letter-spacing:-.02em;margin-bottom:32px;opacity:0;transform:translateY(60px);animation:revealUp 1s var(--ease-expo) .5s forwards}.hero h1 em{font-style:italic;color:var(--crimson-glow);display:inline-block}.hero-sub{font-size:var(--text-body-lg);font-weight:300;line-height:1.7;max-width:520px;color:rgba(245,240,232,.6);margin-bottom:48px;opacity:0;transform:translateY(40px);animation:revealUp .8s var(--ease-expo) .8s forwards}.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;opacity:0;transform:translateY(30px);animation:revealUp .8s var(--ease-expo) 1s forwards}@keyframes revealUp{to{opacity:1;transform:translateY(0)}}
+        .btn-primary{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:var(--amber);color:var(--deep-black);font-family:var(--font-body);font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:all .4s var(--ease-expo);position:relative;overflow:hidden}.btn-primary::before{content:'';position:absolute;inset:0;background:var(--amber-light);transform:translateX(-100%);transition:transform .5s var(--ease-expo)}.btn-primary:hover::before{transform:translateX(0)}.btn-primary span{position:relative;z-index:1}.btn-ghost{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:transparent;color:var(--cream);font-family:var(--font-body);font-size:12px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(245,240,232,.2);cursor:pointer;transition:all .4s var(--ease-expo)}.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+        .drops{padding:120px 48px;position:relative}.drops::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,74,.2),transparent)}.section-label{font-size:var(--text-caption);letter-spacing:.5em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}.section-title{font-family:var(--font-display);font-size:var(--text-section);font-weight:700;line-height:1.05;margin-bottom:64px;max-width:600px}.drops-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}.drop-card{position:relative;aspect-ratio:4/5;overflow:hidden;cursor:pointer;background:#111}.drop-card-bg{position:absolute;inset:0;transition:transform 1.2s var(--ease-expo)}.drop-card:hover .drop-card-bg{transform:scale(1.08)}.drop-card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,10,10,.9) 100%)}.drop-card-content{position:absolute;bottom:0;left:0;right:0;padding:32px;transform:translateY(20px);transition:transform .6s var(--ease-expo)}.drop-card:hover .drop-card-content{transform:translateY(0)}.drop-card-name{font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:6px}.drop-card-hook{font-size:12px;color:rgba(245,240,232,.5);letter-spacing:.1em;margin-bottom:16px}.drop-card-cta{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--amber);opacity:0;transition:opacity .4s .1s}.drop-card:hover .drop-card-cta{opacity:1}
+        .manifesto{padding:160px 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}.manifesto-quote{font-family:var(--font-display);font-size:clamp(40px,6vw,80px);font-weight:400;font-style:italic;line-height:1.1;position:relative}.manifesto-quote::before{content:'';position:absolute;top:-40px;left:0;width:60px;height:2px;background:var(--crimson-glow)}.manifesto-right p{font-size:var(--text-body-lg);line-height:1.9;color:rgba(245,240,232,.55);margin-bottom:24px}
+        .flavors{padding:120px 48px}.flavors-row{display:flex;gap:16px;margin-top:48px;overflow-x:auto;padding-bottom:16px;scrollbar-width:none}.flavors-row::-webkit-scrollbar{display:none}.flavor-chip{flex-shrink:0;padding:20px 36px;border:1px solid rgba(212,160,74,.15);background:rgba(212,160,74,.03);font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:.05em;cursor:pointer;transition:all .5s var(--ease-expo);position:relative;overflow:hidden;white-space:nowrap}.flavor-chip::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease-expo)}.flavor-chip:hover{border-color:var(--amber);background:rgba(212,160,74,.06)}.flavor-chip:hover::after{transform:scaleX(1)}.heat-badge{display:inline-block;margin-left:12px;font-size:10px;color:var(--crimson-glow);letter-spacing:.15em}
+        .lifestyle{padding:120px 48px}.lifestyle-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;grid-template-rows:300px 300px;gap:2px;margin-top:48px}.lifestyle-cell{position:relative;overflow:hidden;background:#111}.lifestyle-cell:first-child{grid-row:1/3}.lifestyle-cell-bg{position:absolute;inset:0;transition:transform 1.2s var(--ease-expo)}.lifestyle-cell:hover .lifestyle-cell-bg{transform:scale(1.05)}.lifestyle-cell-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(10,10,10,.7) 100%)}.lifestyle-cell-text{position:absolute;bottom:24px;left:24px;right:24px;font-family:var(--font-display);font-size:15px;font-style:italic;color:rgba(245,240,232,.7)}
+        .catering{padding:160px 48px;text-align:center;position:relative}.catering::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(139,26,26,.08) 0%,transparent 70%)}.catering .section-title{margin:0 auto 24px;text-align:center;max-width:700px}.catering-body{font-size:var(--text-body-lg);color:rgba(245,240,232,.5);max-width:560px;margin:0 auto 48px;line-height:1.8;position:relative}
+        .vip{padding:120px 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;border-top:1px solid rgba(212,160,74,.08)}.vip-perks{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px}.vip-perk{padding:24px;border:1px solid rgba(212,160,74,.1);background:rgba(212,160,74,.02)}.vip-perk-title{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:6px;color:var(--amber)}.vip-perk-desc{font-size:12px;color:rgba(245,240,232,.4);line-height:1.6}.vip-input{padding:16px 24px;background:rgba(255,255,255,.03);border:1px solid rgba(245,240,232,.1);color:var(--cream);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color .3s;width:100%}.vip-input:focus{border-color:var(--amber)}.vip-input::placeholder{color:rgba(245,240,232,.25)}
+        footer{padding:80px 48px 40px;border-top:1px solid rgba(245,240,232,.06);display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px}.footer-brand{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:.1em;margin-bottom:16px}.footer-brand span{color:var(--amber)}.footer-tagline{font-size:13px;color:rgba(245,240,232,.3);font-style:italic;line-height:1.6}.footer-col-title{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--amber);margin-bottom:20px}.footer-col a{display:block;color:rgba(245,240,232,.4);text-decoration:none;font-size:13px;margin-bottom:12px;transition:color .3s}.footer-col a:hover{color:var(--cream)}.footer-bottom{padding:32px 48px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(245,240,232,.04);font-size:11px;color:rgba(245,240,232,.2)}.footer-bottom a{color:rgba(245,240,232,.2);text-decoration:none}
+        .reveal{opacity:0;transform:translateY(50px);transition:opacity .8s var(--ease-expo),transform .8s var(--ease-expo)}.reveal.visible{opacity:1;transform:translateY(0)}.reveal-delay-1{transition-delay:.1s}.reveal-delay-2{transition-delay:.2s}.reveal-delay-3{transition-delay:.3s}.reveal-delay-4{transition-delay:.4s}.reveal-delay-5{transition-delay:.5s}
+        @media(max-width:768px){nav{padding:16px 24px}.nav-links{display:none}.hero{padding:0 24px 60px}.drops{padding:80px 24px}.drops-grid{grid-template-columns:1fr 1fr}.manifesto{grid-template-columns:1fr;padding:80px 24px;gap:40px}.flavors{padding:80px 24px}.lifestyle{padding:80px 24px}.lifestyle-grid{grid-template-columns:1fr 1fr;grid-template-rows:250px 200px 200px}.lifestyle-cell:first-child{grid-row:auto}.catering{padding:80px 24px}.vip{grid-template-columns:1fr;padding:80px 24px;gap:40px}footer{grid-template-columns:1fr 1fr;padding:60px 24px 30px}.footer-bottom{padding:24px;flex-direction:column;gap:12px}}
       `}</style>
-
-      {/* NAV */}
-      <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,padding:'24px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',mixBlendMode:'difference'}}>
-        <div style={{fontFamily:'var(--font-display)',fontSize:'18px',fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--cream)'}}>Angel <span style={{color:'var(--amber)'}}>Wings</span></div>
-        <div style={{display:'flex',gap:'32px',alignItems:'center'}}>
-          {['Menu','Flavors','Catering','Rewards'].map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`} style={{color:'var(--cream)',textDecoration:'none',fontSize:'11px',letterSpacing:'0.3em',textTransform:'uppercase',fontWeight:400,opacity:0.7}}>{l}</a>
-          ))}
-          <a href="#" style={{display:'inline-flex',alignItems:'center',padding:'10px 24px',background:'var(--amber)',color:'var(--deep-black)',fontSize:'10px',fontWeight:600,letterSpacing:'0.15em',textTransform:'uppercase',textDecoration:'none'}}>Order Now</a>
-        </div>
-      </nav>
-
-      {/* HERO */}
-      <section style={{position:'relative',height:'100vh',minHeight:'700px',display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:'0 48px 80px',overflow:'hidden'}}>
-        <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 60% 50% at 65% 40%, rgba(212,160,74,0.12) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 30% 70%, rgba(139,26,26,0.15) 0%, transparent 60%), radial-gradient(circle at 50% 0%, rgba(212,160,74,0.06) 0%, transparent 50%), linear-gradient(180deg, var(--deep-black) 0%, #0D0808 50%, var(--deep-black) 100%)'}} />
-        <div style={{position:'absolute',top:'-20%',left:'55%',width:'200px',height:'140%',background:'linear-gradient(180deg, rgba(212,160,74,0.08) 0%, rgba(212,160,74,0.03) 40%, transparent 80%)',transform:'rotate(-8deg)',filter:'blur(40px)',animation:'beamPulse 6s var(--ease-smooth) infinite'}} />
-        <div className="hero-halo" style={{position:'absolute',top:'18%',left:'50%',transform:'translateX(-50%)',width:'clamp(200px, 30vw, 400px)',height:'clamp(200px, 30vw, 400px)',border:'1px solid rgba(212,160,74,0.15)',borderRadius:'50%',animation:'haloGlow 4s var(--ease-smooth) infinite'}} />
-        {[20,45,65,80,35,55,75].map((l,i) => (
-          <div key={i} className="particle" style={{position:'absolute',left:`${l}%`,bottom:`${20+i*5}%`,width:'2px',height:'2px',background:'rgba(212,160,74,0.3)',borderRadius:'50%',animation:`particleRise 8s linear infinite ${i*1.2}s`}} />
-        ))}
-        <div style={{position:'relative',zIndex:2,maxWidth:'900px'}}>
-          <div style={{fontSize:'var(--text-caption)',letterSpacing:'0.5em',textTransform:'uppercase',color:'var(--amber)',marginBottom:'24px',opacity:0,transform:'translateY(30px)',animation:'revealUp 0.8s var(--ease-expo) 0.3s forwards'}}>Crisp Texture · Bold Sauce · Late-Night Obsession</div>
-          <h1 style={{fontFamily:'var(--font-display)',fontSize:'var(--text-hero)',fontWeight:900,lineHeight:0.9,letterSpacing:'-0.02em',marginBottom:'32px',opacity:0,transform:'translateY(60px)',animation:'revealUp 1s var(--ease-expo) 0.5s forwards'}}>Heaven Sent.<br/><em style={{fontStyle:'italic',color:'var(--crimson-glow)'}}>Sinfully Good.</em></h1>
-          <p style={{fontSize:'var(--text-body-lg)',fontWeight:300,lineHeight:1.7,maxWidth:'520px',color:'rgba(245,240,232,0.6)',marginBottom:'48px',opacity:0,transform:'translateY(40px)',animation:'revealUp 0.8s var(--ease-expo) 0.8s forwards'}}>Angel Wings turns hunger into a full experience. Crisp texture. Bold sauce. Heat that hits different. This is the late-night altar for flavor.</p>
-          <div style={{display:'flex',gap:'16px',flexWrap:'wrap',opacity:0,transform:'translateY(30px)',animation:'revealUp 0.8s var(--ease-expo) 1s forwards'}}>
-            <a href="#" style={{display:'inline-flex',padding:'16px 40px',background:'var(--amber)',color:'var(--deep-black)',fontSize:'12px',fontWeight:600,letterSpacing:'0.2em',textTransform:'uppercase',textDecoration:'none'}}>Order Now</a>
-            <a href="#menu" style={{display:'inline-flex',padding:'16px 40px',background:'transparent',color:'var(--cream)',fontSize:'12px',letterSpacing:'0.2em',textTransform:'uppercase',textDecoration:'none',border:'1px solid rgba(245,240,232,0.2)'}}>Explore the Menu</a>
-            <a href="#catering" style={{display:'inline-flex',padding:'16px 40px',background:'transparent',color:'var(--cream)',fontSize:'12px',letterSpacing:'0.2em',textTransform:'uppercase',textDecoration:'none',border:'1px solid rgba(245,240,232,0.2)'}}>Book Catering</a>
-          </div>
-        </div>
-      </section>
-
-      {/* DROPS */}
-      <section id="menu" style={{padding:'120px 48px',position:'relative',borderTop:'1px solid rgba(212,160,74,0.1)'}}>
-        <div className="reveal" style={{fontSize:'var(--text-caption)',letterSpacing:'0.5em',textTransform:'uppercase',color:'var(--amber)',marginBottom:'16px'}}>Featured Drops</div>
-        <h2 className="reveal reveal-delay-1" style={{fontFamily:'var(--font-display)',fontSize:'var(--text-section)',fontWeight:700,lineHeight:1.05,marginBottom:'64px'}}>The Collection.</h2>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3, 1fr)',gap:'2px'}}>
-          {[{name:'The Halo Box',hook:'12 wings · 2 sauces · the full ritual',bg:'#1a0a0a'},{name:'The Heat Collection',hook:'For those who worship the burn',bg:'#1a0f00'},{name:'Tenders & Testimony',hook:'Crisp. Golden. Undeniable.',bg:'#0a0a1a'},{name:'Loaded Fry Ritual',hook:'Sauce. Cheese. No restraint.',bg:'#1a1000'},{name:'Signature Sauce Vault',hook:'7 worlds. One obsession.',bg:'#0d0a0a'},{name:'Family Feast Drops',hook:'Feed the whole crew. Own the night.',bg:'#0f0808'}].map((d,i) => (
-            <div key={i} className={`reveal reveal-delay-${Math.min(i+1,5)}`} style={{position:'relative',aspectRatio:'4/5',overflow:'hidden',cursor:'pointer',background:d.bg}}>
-              <div style={{position:'absolute',inset:0,background:`linear-gradient(180deg, transparent 40%, rgba(10,10,10,0.9) 100%)`}} />
-              <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'32px'}}>
-                <div style={{fontFamily:'var(--font-display)',fontSize:'22px',fontWeight:700,marginBottom:'6px'}}>{d.name}</div>
-                <div style={{fontSize:'12px',color:'rgba(245,240,232,0.5)',letterSpacing:'0.1em',marginBottom:'16px'}}>{d.hook}</div>
-                <div style={{fontSize:'10px',letterSpacing:'0.3em',textTransform:'uppercase',color:'var(--amber)'}}>Order →</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* MANIFESTO */}
-      <section style={{padding:'160px 48px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'80px',alignItems:'center'}}>
-        <div className="reveal">
-          <div style={{width:'60px',height:'2px',background:'var(--crimson-glow)',marginBottom:'40px'}} />
-          <div style={{fontFamily:'var(--font-display)',fontSize:'clamp(40px, 6vw, 80px)',fontWeight:400,fontStyle:'italic',lineHeight:1.1}}>A late-night altar for flavor.</div>
-        </div>
-        <div>
-          <p className="reveal reveal-delay-1" style={{fontSize:'var(--text-body-lg)',lineHeight:1.9,color:'rgba(245,240,232,0.55)',marginBottom:'24px'}}>Angel Wings is built for the people who do not crave average. It is crisp, heat, sauce, texture, and energy wrapped in a premium visual identity.</p>
-          <p className="reveal reveal-delay-2" style={{fontSize:'var(--text-body-lg)',lineHeight:1.9,color:'rgba(245,240,232,0.55)',marginBottom:'24px'}}>From solo runs to group orders, game nights to after-hours linkups — Angel Wings is designed to feel bigger than a meal.</p>
-          <p className="reveal reveal-delay-3" style={{color:'var(--amber)',fontStyle:'italic',fontFamily:'var(--font-display)',fontSize:'18px'}}>Wings Worth Worship.</p>
-        </div>
-      </section>
-
-      {/* FLAVORS */}
-      <section id="flavors" style={{padding:'120px 48px'}}>
-        <div className="reveal" style={{fontSize:'var(--text-caption)',letterSpacing:'0.5em',textTransform:'uppercase',color:'var(--amber)',marginBottom:'16px'}}>Flavor Universe</div>
-        <h2 className="reveal reveal-delay-1" style={{fontFamily:'var(--font-display)',fontSize:'var(--text-section)',fontWeight:700,lineHeight:1.05,marginBottom:'48px'}}>Enter the vault.</h2>
-        <div className="reveal reveal-delay-2" style={{display:'flex',gap:'16px',overflowX:'auto',paddingBottom:'16px'}}>
-          {[{n:'Holy Heat',h:'🔥🔥🔥🔥'},{n:'Sweet Salvation',h:'🔥'},{n:'Garlic Glory',h:'🔥🔥'},{n:'Lemon Praise',h:'🔥'},{n:'BBQ Baptism',h:'🔥🔥'},{n:'Mild Mercy',h:'—'},{n:'Inferno Revival',h:'🔥🔥🔥🔥🔥'}].map((f,i) => (
-            <div key={i} style={{flexShrink:0,padding:'20px 36px',border:'1px solid rgba(212,160,74,0.15)',background:'rgba(212,160,74,0.03)',fontFamily:'var(--font-display)',fontSize:'16px',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}>
-              {f.n} <span style={{fontSize:'10px',color:'var(--crimson-glow)',marginLeft:'12px',letterSpacing:'0.15em'}}>{f.h}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CATERING */}
-      <section id="catering" style={{padding:'160px 48px',textAlign:'center',position:'relative'}}>
-        <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,26,26,0.08) 0%, transparent 70%)'}} />
-        <div className="reveal" style={{fontSize:'var(--text-caption)',letterSpacing:'0.5em',textTransform:'uppercase',color:'var(--amber)',marginBottom:'16px',position:'relative'}}>Catering & Group Orders</div>
-        <h2 className="reveal reveal-delay-1" style={{fontFamily:'var(--font-display)',fontSize:'var(--text-section)',fontWeight:700,lineHeight:1.05,marginBottom:'24px',maxWidth:'700px',margin:'0 auto 24px',position:'relative'}}>Feed the whole table.</h2>
-        <p className="reveal reveal-delay-2" style={{fontSize:'var(--text-body-lg)',color:'rgba(245,240,232,0.5)',maxWidth:'560px',margin:'0 auto 48px',lineHeight:1.8,position:'relative'}}>From private events to office drops and large-format nights, Angel Wings catering is built for groups that want heat, speed, and branded presentation.</p>
-        <a href="#" className="reveal reveal-delay-3" style={{display:'inline-flex',padding:'16px 40px',background:'var(--amber)',color:'var(--deep-black)',fontSize:'12px',fontWeight:600,letterSpacing:'0.2em',textTransform:'uppercase',textDecoration:'none',position:'relative'}}>Start Catering Order</a>
-      </section>
-
-      {/* VIP */}
-      <section id="rewards" style={{padding:'120px 48px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'80px',alignItems:'center',borderTop:'1px solid rgba(212,160,74,0.08)'}}>
-        <div>
-          <div className="reveal" style={{fontSize:'var(--text-caption)',letterSpacing:'0.5em',textTransform:'uppercase',color:'var(--amber)',marginBottom:'16px'}}>Rewards & VIP</div>
-          <h2 className="reveal reveal-delay-1" style={{fontFamily:'var(--font-display)',fontSize:'var(--text-section)',fontWeight:700,lineHeight:1.05,marginBottom:'32px'}}>Unlock drops, deals, and first access.</h2>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}>
-            {[{t:'First Order Reward',d:'Welcome bonus on your inaugural box.'},{t:'VIP Flavor Drops',d:'Early access to limited sauces.'},{t:'Surprise Add-Ons',d:'Random bonus items in qualifying orders.'},{t:'Birthday Perks',d:'Free box on your day. No catch.'}].map((p,i) => (
-              <div key={i} className={`reveal reveal-delay-${i+2}`} style={{padding:'24px',border:'1px solid rgba(212,160,74,0.1)',background:'rgba(212,160,74,0.02)'}}>
-                <div style={{fontFamily:'var(--font-display)',fontSize:'14px',fontWeight:700,color:'var(--amber)',marginBottom:'6px'}}>{p.t}</div>
-                <div style={{fontSize:'12px',color:'rgba(245,240,232,0.4)',lineHeight:1.6}}>{p.d}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="reveal reveal-delay-2" style={{display:'flex',flexDirection:'column',gap:'16px'}}>
-          <input style={{padding:'16px 24px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(245,240,232,0.1)',color:'var(--cream)',fontFamily:'var(--font-body)',fontSize:'14px',outline:'none'}} placeholder="Your name" />
-          <input style={{padding:'16px 24px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(245,240,232,0.1)',color:'var(--cream)',fontFamily:'var(--font-body)',fontSize:'14px',outline:'none'}} placeholder="Email address" type="email" />
-          <input style={{padding:'16px 24px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(245,240,232,0.1)',color:'var(--cream)',fontFamily:'var(--font-body)',fontSize:'14px',outline:'none'}} placeholder="Phone (for SMS drops)" type="tel" />
-          <a href="#" style={{display:'inline-flex',justifyContent:'center',padding:'16px 40px',background:'var(--amber)',color:'var(--deep-black)',fontSize:'12px',fontWeight:600,letterSpacing:'0.2em',textTransform:'uppercase',textDecoration:'none'}}>Join the VIP</a>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer style={{padding:'80px 48px 40px',borderTop:'1px solid rgba(245,240,232,0.06)',display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr',gap:'48px'}}>
-        <div>
-          <div style={{fontFamily:'var(--font-display)',fontSize:'24px',fontWeight:700,letterSpacing:'0.1em',marginBottom:'16px'}}>Angel <span style={{color:'var(--amber)'}}>Wings</span></div>
-          <p style={{fontSize:'13px',color:'rgba(245,240,232,0.3)',fontStyle:'italic'}}>Heaven Sent. Sinfully Good.<br/>A Casper Group brand.</p>
-        </div>
-        {[
-          {title:'Order',links:['Menu','Order Now','Catering','Group Orders']},
-          {title:'Discover',links:['Flavors','Locations','Rewards','About']},
-          {title:'Connect',links:['Instagram','TikTok','Twitter','Franchise']}
-        ].map((col,i) => (
-          <div key={i}>
-            <div style={{fontSize:'10px',letterSpacing:'0.4em',textTransform:'uppercase',color:'var(--amber)',marginBottom:'20px'}}>{col.title}</div>
-            {col.links.map(l => <a key={l} href="#" style={{display:'block',color:'rgba(245,240,232,0.4)',textDecoration:'none',fontSize:'13px',marginBottom:'12px'}}>{l}</a>)}
-          </div>
-        ))}
-      </footer>
-      <div style={{padding:'32px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid rgba(245,240,232,0.04)',fontSize:'11px',color:'rgba(245,240,232,0.2)'}}>
-        <span>© 2026 Angel Wings. All rights reserved.</span>
-        <span style={{fontSize:'10px',letterSpacing:'0.2em',textTransform:'uppercase'}}>A Casper Group Brand</span>
-      </div>
+      <nav><div className="nav-logo">Angel <span>Wings</span></div><ul className="nav-links"><li><a href="#menu">Menu</a></li><li><a href="#flavors">Flavors</a></li><li><a href="#catering">Catering</a></li><li><a href="#vip">Rewards</a></li><li><a href="#" className="btn-primary" style={{padding:'10px 24px',fontSize:'10px',letterSpacing:'0.15em'}}><span>Order Now</span></a></li></ul></nav>
+      <section className="hero"><div className="hero-bg"/><div className="hero-beam"/><div className="hero-beam hero-beam-2"/><div className="hero-halo"/>{[20,45,65,80,35,55,75].map((l,i)=>(<div key={i} className="particle" style={{left:`${l}%`,bottom:`${[30,20,35,25,40,15,45][i]}%`,animationDelay:`${[0,1.5,3,4.5,6,2,5][i]}s`}}/>))}<div className="hero-content"><div className="hero-tag">Crisp Texture · Bold Sauce · Late-Night Obsession</div><h1>Heaven Sent.<br/><em>Sinfully Good.</em></h1><p className="hero-sub">Angel Wings turns hunger into a full experience. Crisp texture. Bold sauce. Heat that hits different. This is the late-night altar for flavor.</p><div className="hero-ctas"><a href="#" className="btn-primary"><span>Order Now</span></a><a href="#menu" className="btn-ghost">Explore the Menu</a><a href="#catering" className="btn-ghost">Book Catering</a></div></div></section>
+      <section className="drops" id="menu"><div className="section-label reveal">Featured Drops</div><h2 className="section-title reveal reveal-delay-1">The Collection.</h2><div className="drops-grid">{drops.map((item,i)=>(<div key={i} className={`drop-card reveal reveal-delay-${Math.min(i+1,4)}`}><div className="drop-card-bg" style={{background:item.bg}}/><div className="drop-card-overlay"/><div className="drop-card-content"><div className="drop-card-name">{item.name}</div><div className="drop-card-hook">{item.hook}</div><div className="drop-card-cta">Order →</div></div></div>))}</div></section>
+      <section className="manifesto"><div className="manifesto-left reveal"><div className="manifesto-quote">A late-night altar for flavor.</div></div><div className="manifesto-right"><p className="reveal reveal-delay-1">Angel Wings is built for the people who do not crave average. It is crisp, heat, sauce, texture, and energy wrapped in a premium visual identity.</p><p className="reveal reveal-delay-2">From solo runs to group orders, game nights to after-hours linkups — Angel Wings is designed to feel bigger than a meal. It is the moment people talk about after the box is empty.</p><p className="reveal reveal-delay-3" style={{color:'var(--amber)',fontStyle:'italic',fontFamily:'var(--font-display)'}}>Wings Worth Worship.</p></div></section>
+      <section className="flavors" id="flavors"><div className="section-label reveal">Flavor Universe</div><h2 className="section-title reveal reveal-delay-1">Enter the vault.</h2><div className="flavors-row reveal reveal-delay-2">{flavors.map((f,i)=>(<div key={i} className="flavor-chip">{f.name} <span className="heat-badge">{f.heat}</span></div>))}</div></section>
+      <section className="lifestyle"><div className="section-label reveal">The Culture</div><h2 className="section-title reveal reveal-delay-1">Built for the after-hours.</h2><div className="lifestyle-grid">{[{text:'Built for nights that run late.',bg:'linear-gradient(180deg,#1a0d0a 0%,#0d0808 100%)'},{text:'Built for the group chat pull-up.',bg:'linear-gradient(180deg,#0f0a05 0%,#0a0808 100%)'},{text:'Built for the after-hours crowd.',bg:'linear-gradient(180deg,#100808 0%,#080505 100%)'},{text:'Studio sessions. Game nights. Victory laps.',bg:'linear-gradient(180deg,#0d0a08 0%,#080605 100%)'},{text:'Branded. Premium. Unmatched.',bg:'linear-gradient(180deg,#0f0808 0%,#0a0505 100%)'}].map((s,i)=>(<div key={i} className={`lifestyle-cell reveal reveal-delay-${Math.min(i+1,4)}`}><div className="lifestyle-cell-bg" style={{background:s.bg}}/><div className="lifestyle-cell-overlay"/><div className="lifestyle-cell-text">{s.text}</div></div>))}</div></section>
+      <section className="catering" id="catering"><div className="section-label reveal">Catering & Group Orders</div><h2 className="section-title reveal reveal-delay-1">Feed the whole table.</h2><p className="catering-body reveal reveal-delay-2">From private events to office drops and large-format nights, Angel Wings catering is built for groups that want heat, speed, and branded presentation that feels elevated.</p><a href="#" className="btn-primary reveal reveal-delay-3"><span>Start Catering Order</span></a></section>
+      <section className="vip" id="vip"><div><div className="section-label reveal">Rewards & VIP</div><h2 className="section-title reveal reveal-delay-1">Unlock drops, deals, and first access.</h2><div className="vip-perks">{perks.map((p,i)=>(<div key={i} className={`vip-perk reveal reveal-delay-${i+2}`}><div className="vip-perk-title">{p.title}</div><div className="vip-perk-desc">{p.desc}</div></div>))}</div></div><div className="reveal reveal-delay-2" style={{display:'flex',flexDirection:'column',gap:'16px'}}><input className="vip-input" type="text" placeholder="Your name"/><input className="vip-input" type="email" placeholder="Email address"/><input className="vip-input" type="tel" placeholder="Phone (for SMS drops)"/><a href="#" className="btn-primary" style={{textAlign:'center',justifyContent:'center'}}><span>Join the VIP</span></a></div></section>
+      <footer><div><div className="footer-brand">Angel <span>Wings</span></div><p className="footer-tagline">Heaven Sent. Sinfully Good.<br/>A Casper Group brand.</p></div><div className="footer-col"><div className="footer-col-title">Order</div><a href="#">Menu</a><a href="#">Order Now</a><a href="#">Catering</a><a href="#">Group Orders</a></div><div className="footer-col"><div className="footer-col-title">Discover</div><a href="#">Flavors</a><a href="#">Locations</a><a href="#">Rewards</a><a href="#">About</a></div><div className="footer-col"><div className="footer-col-title">Connect</div><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">Twitter</a><a href="#">Franchise</a></div></footer>
+      <div className="footer-bottom"><span>© 2026 Angel Wings. All rights reserved.</span><span style={{fontSize:'10px',letterSpacing:'0.2em',textTransform:'uppercase' as const}}>A <a href="#">Casper Group</a> Brand</span></div>
     </>
   )
 }
