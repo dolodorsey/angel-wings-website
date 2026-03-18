@@ -70,7 +70,7 @@ function VideoIntroHero() {
         }}>
           <video autoPlay muted loop playsInline style={{
             width: '100%', height: '100%', objectFit: 'cover',
-            filter: 'brightness(0.6) contrast(1.2) saturate(0.8)'
+            filter: 'brightness(0.8) contrast(1.1) saturate(0.9)'
           }}><source src="/videos/hero.mp4" type="video/mp4" /></video>
           <div style={{
             position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -91,14 +91,14 @@ function VideoIntroHero() {
       >
         <video autoPlay muted loop playsInline style={{
           position: 'absolute', inset: '-5%', width: '110%', height: '110%', objectFit: 'cover',
-          filter: 'brightness(0.2) contrast(1.2) saturate(0.5)',
+          filter: 'brightness(0.45) contrast(1.1) saturate(0.7)',
           transform: `scale(1.02) translate(${(mouse.x - 0.5) * -10}px,${(mouse.y - 0.5) * -10}px)`,
           transition: 'transform 0.3s ease'
         }}><source src="/videos/hero.mp4" type="video/mp4" /></video>
 
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg,${C.dark}00 0%,${C.dark}99 60%,${C.dark} 100%)` }} />
         <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at ${mouse.x * 100}% ${mouse.y * 100}%,${C.crimsonGlow},transparent 50%)` }} />
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.04, pointerEvents: 'none', mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.14, pointerEvents: 'none', mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
 
         <div style={{ position: 'relative', zIndex: 2, padding: '160px clamp(32px,8vw,100px) 120px', maxWidth: 1300, margin: '0 auto', width: '100%' }}>
           <div style={{ opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(60px)', transition: 'all 1.4s cubic-bezier(0.16,1,0.3,1) 0.2s' }}>
@@ -144,7 +144,7 @@ function Nav() {
 function Drops() {
   return (
     <section id="menu" style={{ background: C.base, padding: '120px clamp(32px,8vw,100px)', borderTop: `1px solid ${C.amberDim}`, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}><img src="/images/wings-halo-plate.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.25) saturate(0.4)' }} /></div>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }}><img src="/images/wings-halo-plate.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5) saturate(0.6)' }} /></div>
       <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Featured Drops</div>
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.02em', color: C.cream, marginBottom: 64 }}>The Collection.</h2></Rev>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
@@ -172,7 +172,7 @@ function Drops() {
 function Manifesto() {
   return (
     <section style={{ padding: '160px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.05, pointerEvents: 'none' }}><img src="/images/brand-pattern.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.25) saturate(0.4)' }} /></div>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none' }}><img src="/images/brand-pattern.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5) saturate(0.6)' }} /></div>
       <Rev><div>
         <div style={{ width: 60, height: 2, background: C.crimson, marginBottom: 40 }} />
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.05, color: C.cream }}>A late-night altar for flavor.</h2>
@@ -191,7 +191,7 @@ function FlavorVault() {
   const [hover, setHover] = useState<number | null>(null)
   return (
     <section id="flavors" style={{ padding: '120px clamp(32px,8vw,100px)', background: C.dark, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}><img src="/images/sauce-vault.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }}><img src="/images/sauce-vault.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
       <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Flavor Universe</div>
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Enter the vault.</h2></Rev>
       <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -221,7 +221,7 @@ function Lifestyle() {
   ]
   return (
     <section style={{ padding: '120px clamp(32px,8vw,100px)', background: C.base, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.05, pointerEvents: 'none' }}><img src="/images/hero-wings-neon.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none' }}><img src="/images/hero-wings-neon.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
       <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>The Culture</div>
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Built for the after-hours.</h2></Rev>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
@@ -245,7 +245,7 @@ function Lifestyle() {
 function Catering() {
   return (
     <section id="catering" style={{ padding: '160px clamp(32px,8vw,100px)', textAlign: 'center', background: C.dark, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}><img src="/images/loudini-mascot.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }}><img src="/images/loudini-mascot.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
       <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 50% 50%,${C.crimsonGlow},transparent 70%)` }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Catering & Group Orders</div>
@@ -261,7 +261,7 @@ function Catering() {
 function VIP() {
   return (
     <section id="rewards" style={{ padding: '120px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, borderTop: `1px solid ${C.border}`, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.05, pointerEvents: 'none' }}><img src="/images/sauce-pour.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none' }}><img src="/images/sauce-pour.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
       <div>
         <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Rewards & VIP</div>
           <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 36 }}>Unlock drops, deals, and first access.</h2></Rev>
