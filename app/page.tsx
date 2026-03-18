@@ -1,84 +1,316 @@
 'use client'
+import { useState, useEffect, useRef } from 'react'
 
-import { useEffect } from 'react'
+/* ═══════════════════════════════════════════════════════════════════════
+   ANGEL WINGS — EXTRAORDINARY V2
+   Casper Group sub-brand. Crimson/Amber on deep black.
+   Video intro → hero BG. Late-night heat. Premium wing culture.
+   ═══════════════════════════════════════════════════════════════════════ */
 
-export default function Home() {
+const C = {
+  base: '#0A0A0D', dark: '#060608', surface: '#111114', surface2: '#16161A',
+  crimson: '#8B1A1A', crimsonGlow: 'rgba(139,26,26,0.10)',
+  amber: '#D4A04A', amberLight: '#E8C374', amberDim: 'rgba(212,160,74,0.06)',
+  cream: '#F5F0E8', muted: 'rgba(245,240,232,0.4)', dim: 'rgba(245,240,232,0.1)',
+  border: 'rgba(245,240,232,0.05)',
+}
+
+function useInView(t=0.1){const ref=useRef<HTMLDivElement>(null);const[v,setV]=useState(false);useEffect(()=>{const el=ref.current;if(!el)return;const o=new IntersectionObserver(([e])=>{if(e.isIntersecting){setV(true);o.unobserve(el)}},{threshold:t});o.observe(el);return()=>o.disconnect()},[t]);return[ref,v] as const}
+function Rev({children,d=0,y=48}:{children:React.ReactNode;d?:number;y?:number}){const[ref,v]=useInView();return<div ref={ref} style={{transform:v?'translateY(0)':`translateY(${y}px)`,opacity:v?1:0,transition:`all 1.1s cubic-bezier(0.16,1,0.3,1) ${d}s`}}>{children}</div>}
+
+const drops = [
+  { name: 'Halo Wings', hook: '10pc tossed in our signature glaze', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/wings-halo-plate.jpg') center/cover" },
+  { name: 'Lemon Pepper Ritual', hook: 'ATL-style. Wet. Properly executed.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/lemon-pepper.png') center/cover" },
+  { name: 'The Sauce Vault', hook: 'Six proprietary sauces. Earn your heat level.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/sauce-vault.jpg') center/cover" },
+  { name: 'Wings & Waffles', hook: 'Sweet and heat. The brunch crossover.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/wings-slate.png') center/cover" },
+  { name: 'Loaded Fry Box', hook: 'Fries. Cheese. Sauce. Everything on top.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/halo-box-tray.jpg') center/cover" },
+  { name: 'Late Night Box', hook: 'The 2AM survival kit. Wings + fries + drink.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/branded-cup.jpg') center/cover" },
+]
+
+const flavors = [
+  { name: 'Halo Glaze', heat: '●○○○○' }, { name: 'Garlic Parm', heat: '●○○○○' },
+  { name: 'Lemon Pepper Wet', heat: '●●○○○' }, { name: 'Honey Chipotle', heat: '●●●○○' },
+  { name: 'Mango Habanero', heat: '●●●●○' }, { name: 'Reaper\'s Kiss', heat: '●●●●●' },
+  { name: 'BBQ Classic', heat: '●●○○○' }, { name: 'Buffalo OG', heat: '●●●○○' },
+  { name: 'Sweet Chili', heat: '●●○○○' }, { name: 'Jerk Season', heat: '●●●●○' },
+]
+
+const perks = [
+  { title: 'Free Wings', desc: 'Earn points on every order. Free wings at every tier.' },
+  { title: 'Early Drops', desc: 'First access to new flavors and limited-run sauces.' },
+  { title: 'Birthday Box', desc: 'Free premium box on your birthday. Every year.' },
+  { title: 'VIP Events', desc: 'Invite-only tasting events and sauce vault previews.' },
+]
+
+/* ─── VIDEO INTRO → HERO BG ─── */
+function VideoIntroHero() {
+  const [phase, setPhase] = useState(0)
+  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
+
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add('visible')
-        })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-    )
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
-    const handleMouseMove = (e: MouseEvent) => {
-      const halo = document.querySelector('.hero-halo') as HTMLElement
-      if (!halo) return
-      const x = (e.clientX / window.innerWidth - 0.5) * 20
-      const y = (e.clientY / window.innerHeight - 0.5) * 20
-      halo.style.transform = `translateX(calc(-50% + ${x}px)) translateY(${y}px)`
-    }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => { observer.disconnect(); window.removeEventListener('mousemove', handleMouseMove) }
+    const t1 = setTimeout(() => setPhase(1), 2000)
+    const t2 = setTimeout(() => setPhase(2), 3000)
+    const t3 = setTimeout(() => setPhase(3), 3600)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [])
-
-  const drops = [
-    { name: 'The Halo Box', hook: '12 wings \u00b7 2 sauces \u00b7 the full ritual', bg: "url('/images/halo-box-tray.jpg') center/cover" },
-    { name: 'The Heat Collection', hook: 'For those who worship the burn', bg: "url('/images/sauce-pour.jpg') center/cover" },
-    { name: 'Tenders & Testimony', hook: 'Crisp. Golden. Undeniable.', bg: "url('/images/lemon-pepper.png') center/cover" },
-    { name: 'Loaded Fry Ritual', hook: 'Sauce. Cheese. No restraint.', bg: "url('/images/wings-halo-plate.jpg') center/cover" },
-    { name: 'Signature Sauce Vault', hook: '7 worlds. One obsession.', bg: "url('/images/sauce-vault.jpg') center/cover" },
-    { name: 'Family Feast Drops', hook: 'Feed the whole crew. Own the night.', bg: "url('/images/loudini-mascot.jpg') center/cover" },
-  ]
-  const flavors = [
-    { name: 'Holy Heat', heat: '\ud83d\udd25\ud83d\udd25\ud83d\udd25\ud83d\udd25' },
-    { name: 'Sweet Salvation', heat: '\ud83d\udd25' },
-    { name: 'Garlic Glory', heat: '\ud83d\udd25\ud83d\udd25' },
-    { name: 'Lemon Praise', heat: '\ud83d\udd25' },
-    { name: 'BBQ Baptism', heat: '\ud83d\udd25\ud83d\udd25' },
-    { name: 'Mild Mercy', heat: '\u2014' },
-    { name: 'Inferno Revival', heat: '\ud83d\udd25\ud83d\udd25\ud83d\udd25\ud83d\udd25\ud83d\udd25' },
-  ]
-  const perks = [
-    { title: 'First Order Reward', desc: 'Welcome bonus on your inaugural box.' },
-    { title: 'VIP Flavor Drops', desc: 'Early access to limited sauces and seasonal heat.' },
-    { title: 'Surprise Add-Ons', desc: 'Random bonus items in qualifying orders.' },
-    { title: 'Birthday Perks', desc: 'Free box on your day. No catch.' },
-  ]
 
   return (
     <>
-      <style jsx global>{`
-        :root{--black:#0A0A0A;--deep-black:#050505;--crimson:#8B1A1A;--crimson-glow:#C62828;--amber:#D4A04A;--amber-light:#E8C06A;--cream:#F5F0E8;--chrome:#C0C0C0;--font-display:'Playfair Display',Georgia,serif;--font-body:'DM Sans',system-ui,sans-serif;--ease-expo:cubic-bezier(0.16,1,0.3,1);--ease-smooth:cubic-bezier(0.37,0,0.63,1);--text-hero:clamp(56px,11vw,160px);--text-section:clamp(32px,5.5vw,72px);--text-body-lg:clamp(14px,1.3vw,18px);--text-caption:clamp(9px,0.85vw,11px)}*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--deep-black);color:var(--cream);font-family:var(--font-body);font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
-        .hero-video{position:absolute;inset:0;z-index:0;overflow:hidden}.hero-video video{width:100%;height:100%;object-fit:cover;opacity:0.6}
-        nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}.nav-logo{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cream)}.nav-logo span{color:var(--amber)}.nav-links{display:flex;gap:32px;list-style:none}.nav-links a{color:var(--cream);text-decoration:none;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:400;opacity:.7;transition:opacity .3s}.nav-links a:hover{opacity:1}
-        .hero{position:relative;height:100vh;min-height:700px;display:flex;flex-direction:column;justify-content:flex-end;padding:0 48px 80px;overflow:hidden}.hero-bg{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,5,5,0.2) 0%,rgba(5,5,5,0.5) 40%,rgba(5,5,5,0.92) 100%)}.hero-beam{position:absolute;top:-20%;left:55%;width:200px;height:140%;background:linear-gradient(180deg,rgba(212,160,74,.08) 0%,rgba(212,160,74,.03) 40%,transparent 80%);transform:rotate(-8deg);filter:blur(40px);animation:beamPulse 6s var(--ease-smooth) infinite}.hero-beam-2{left:35%;width:120px;opacity:.5;transform:rotate(5deg);animation-delay:-3s}@keyframes beamPulse{0%,100%{opacity:.6}50%{opacity:1}}
-        .hero-halo{position:absolute;top:18%;left:50%;transform:translateX(-50%);width:clamp(200px,30vw,400px);height:clamp(200px,30vw,400px);border:1px solid rgba(212,160,74,.15);border-radius:50%;animation:haloGlow 4s var(--ease-smooth) infinite}.hero-halo::after{content:'';position:absolute;inset:-20px;border:1px solid rgba(212,160,74,.06);border-radius:50%}@keyframes haloGlow{0%,100%{opacity:.4;box-shadow:0 0 60px rgba(212,160,74,.05)}50%{opacity:1;box-shadow:0 0 120px rgba(212,160,74,.12)}}
-        .particle{position:absolute;width:2px;height:2px;background:rgba(212,160,74,.3);border-radius:50%;animation:particleRise 8s linear infinite}@keyframes particleRise{0%{transform:translateY(0) scale(1);opacity:0}10%{opacity:.6}90%{opacity:0}100%{transform:translateY(-400px) scale(.3);opacity:0}}
-        .hero-content{position:relative;z-index:2;max-width:900px}.hero-tag{font-size:var(--text-caption);letter-spacing:.5em;text-transform:uppercase;color:var(--amber);margin-bottom:24px;opacity:0;transform:translateY(30px);animation:revealUp .8s var(--ease-expo) .3s forwards}.hero h1{font-family:var(--font-display);font-size:var(--text-hero);font-weight:900;line-height:.9;letter-spacing:-.02em;margin-bottom:32px;opacity:0;transform:translateY(60px);animation:revealUp 1s var(--ease-expo) .5s forwards}.hero h1 em{font-style:italic;color:var(--crimson-glow);display:inline-block}.hero-sub{font-size:var(--text-body-lg);font-weight:300;line-height:1.7;max-width:520px;color:rgba(245,240,232,.6);margin-bottom:48px;opacity:0;transform:translateY(40px);animation:revealUp .8s var(--ease-expo) .8s forwards}.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;opacity:0;transform:translateY(30px);animation:revealUp .8s var(--ease-expo) 1s forwards}@keyframes revealUp{to{opacity:1;transform:translateY(0)}}
-        .btn-primary{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:var(--amber);color:var(--deep-black);font-family:var(--font-body);font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:all .4s var(--ease-expo);position:relative;overflow:hidden}.btn-primary::before{content:'';position:absolute;inset:0;background:var(--amber-light);transform:translateX(-100%);transition:transform .5s var(--ease-expo)}.btn-primary:hover::before{transform:translateX(0)}.btn-primary span{position:relative;z-index:1}.btn-ghost{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:transparent;color:var(--cream);font-family:var(--font-body);font-size:12px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(245,240,232,.2);cursor:pointer;transition:all .4s var(--ease-expo)}.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
-        .drops{padding:120px 48px;position:relative}.drops::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,74,.2),transparent)}.section-label{font-size:var(--text-caption);letter-spacing:.5em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}.section-title{font-family:var(--font-display);font-size:var(--text-section);font-weight:700;line-height:1.05;margin-bottom:64px;max-width:600px}.drops-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}.drop-card{position:relative;aspect-ratio:4/5;overflow:hidden;cursor:pointer;background:#111}.drop-card-bg{position:absolute;inset:0;transition:transform 1.2s var(--ease-expo)}.drop-card:hover .drop-card-bg{transform:scale(1.08)}.drop-card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,10,10,.9) 100%)}.drop-card-content{position:absolute;bottom:0;left:0;right:0;padding:32px;transform:translateY(20px);transition:transform .6s var(--ease-expo)}.drop-card:hover .drop-card-content{transform:translateY(0)}.drop-card-name{font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:6px}.drop-card-hook{font-size:12px;color:rgba(245,240,232,.5);letter-spacing:.1em;margin-bottom:16px}.drop-card-cta{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--amber);opacity:0;transition:opacity .4s .1s}.drop-card:hover .drop-card-cta{opacity:1}
-        .manifesto{padding:160px 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}.manifesto-quote{font-family:var(--font-display);font-size:clamp(40px,6vw,80px);font-weight:400;font-style:italic;line-height:1.1;position:relative}.manifesto-quote::before{content:'';position:absolute;top:-40px;left:0;width:60px;height:2px;background:var(--crimson-glow)}.manifesto-right p{font-size:var(--text-body-lg);line-height:1.9;color:rgba(245,240,232,.55);margin-bottom:24px}
-        .flavors{padding:120px 48px}.flavors-row{display:flex;gap:16px;margin-top:48px;overflow-x:auto;padding-bottom:16px;scrollbar-width:none}.flavors-row::-webkit-scrollbar{display:none}.flavor-chip{flex-shrink:0;padding:20px 36px;border:1px solid rgba(212,160,74,.15);background:rgba(212,160,74,.03);font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:.05em;cursor:pointer;transition:all .5s var(--ease-expo);position:relative;overflow:hidden;white-space:nowrap}.flavor-chip::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease-expo)}.flavor-chip:hover{border-color:var(--amber);background:rgba(212,160,74,.06)}.flavor-chip:hover::after{transform:scaleX(1)}.heat-badge{display:inline-block;margin-left:12px;font-size:10px;color:var(--crimson-glow);letter-spacing:.15em}
-        .lifestyle{padding:120px 48px}.lifestyle-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;grid-template-rows:300px 300px;gap:2px;margin-top:48px}.lifestyle-cell{position:relative;overflow:hidden;background:#111}.lifestyle-cell:first-child{grid-row:1/3}.lifestyle-cell-bg{position:absolute;inset:0;transition:transform 1.2s var(--ease-expo)}.lifestyle-cell:hover .lifestyle-cell-bg{transform:scale(1.05)}.lifestyle-cell-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(10,10,10,.7) 100%)}.lifestyle-cell-text{position:absolute;bottom:24px;left:24px;right:24px;font-family:var(--font-display);font-size:15px;font-style:italic;color:rgba(245,240,232,.7)}
-        .catering{padding:160px 48px;text-align:center;position:relative}.catering::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(139,26,26,.08) 0%,transparent 70%)}.catering .section-title{margin:0 auto 24px;text-align:center;max-width:700px}.catering-body{font-size:var(--text-body-lg);color:rgba(245,240,232,.5);max-width:560px;margin:0 auto 48px;line-height:1.8;position:relative}
-        .vip{padding:120px 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;border-top:1px solid rgba(212,160,74,.08)}.vip-perks{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px}.vip-perk{padding:24px;border:1px solid rgba(212,160,74,.1);background:rgba(212,160,74,.02)}.vip-perk-title{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:6px;color:var(--amber)}.vip-perk-desc{font-size:12px;color:rgba(245,240,232,.4);line-height:1.6}.vip-input{padding:16px 24px;background:rgba(255,255,255,.03);border:1px solid rgba(245,240,232,.1);color:var(--cream);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color .3s;width:100%}.vip-input:focus{border-color:var(--amber)}.vip-input::placeholder{color:rgba(245,240,232,.25)}
-        footer{padding:80px 48px 40px;border-top:1px solid rgba(245,240,232,.06);display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px}.footer-brand{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:.1em;margin-bottom:16px}.footer-brand span{color:var(--amber)}.footer-tagline{font-size:13px;color:rgba(245,240,232,.3);font-style:italic;line-height:1.6}.footer-col-title{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--amber);margin-bottom:20px}.footer-col a{display:block;color:rgba(245,240,232,.4);text-decoration:none;font-size:13px;margin-bottom:12px;transition:color .3s}.footer-col a:hover{color:var(--cream)}.footer-bottom{padding:32px 48px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(245,240,232,.04);font-size:11px;color:rgba(245,240,232,.2)}.footer-bottom a{color:rgba(245,240,232,.2);text-decoration:none}
-        .reveal{opacity:0;transform:translateY(50px);transition:opacity .8s var(--ease-expo),transform .8s var(--ease-expo)}.reveal.visible{opacity:1;transform:translateY(0)}.reveal-delay-1{transition-delay:.1s}.reveal-delay-2{transition-delay:.2s}.reveal-delay-3{transition-delay:.3s}.reveal-delay-4{transition-delay:.4s}.reveal-delay-5{transition-delay:.5s}
-        @media(max-width:768px){nav{padding:16px 24px}.nav-links{display:none}.hero{padding:0 24px 60px}.drops{padding:80px 24px}.drops-grid{grid-template-columns:1fr 1fr}.manifesto{grid-template-columns:1fr;padding:80px 24px;gap:40px}.flavors{padding:80px 24px}.lifestyle{padding:80px 24px}.lifestyle-grid{grid-template-columns:1fr 1fr;grid-template-rows:250px 200px 200px}.lifestyle-cell:first-child{grid-row:auto}.catering{padding:80px 24px}.vip{grid-template-columns:1fr;padding:80px 24px;gap:40px}footer{grid-template-columns:1fr 1fr;padding:60px 24px 30px}.footer-bottom{padding:24px;flex-direction:column;gap:12px}}
-      `}</style>
-      <nav><div className="nav-logo">Angel <span>Wings</span></div><ul className="nav-links"><li><a href="#menu">Menu</a></li><li><a href="#flavors">Flavors</a></li><li><a href="#catering">Catering</a></li><li><a href="#vip">Rewards</a></li><li><a href="#" className="btn-primary" style={{padding:'10px 24px',fontSize:'10px',letterSpacing:'0.15em'}}><span>Order Now</span></a></li></ul></nav>
-      <section className="hero"><div className="hero-bg"/><div className="hero-video"><video autoPlay muted loop playsInline><source src="/videos/hero.mp4" type="video/mp4"/></video></div><div className="hero-beam"/><div className="hero-beam hero-beam-2"/><div className="hero-halo"/>{[20,45,65,80,35,55,75].map((l,i)=>(<div key={i} className="particle" style={{left:`${l}%`,bottom:`${[30,20,35,25,40,15,45][i]}%`,animationDelay:`${[0,1.5,3,4.5,6,2,5][i]}s`}}/>))}<div className="hero-content"><div className="hero-tag">Crisp Texture · Bold Sauce · Late-Night Obsession</div><h1>Heaven Sent.<br/><em>Sinfully Good.</em></h1><p className="hero-sub">Angel Wings turns hunger into a full experience. Crisp texture. Bold sauce. Heat that hits different. This is the late-night altar for flavor.</p><div className="hero-ctas"><a href="#" className="btn-primary"><span>Order Now</span></a><a href="#menu" className="btn-ghost">Explore the Menu</a><a href="#catering" className="btn-ghost">Book Catering</a></div></div></section>
-      <section className="drops" id="menu"><div className="section-label reveal">Featured Drops</div><h2 className="section-title reveal reveal-delay-1">The Collection.</h2><div className="drops-grid">{drops.map((item,i)=>(<div key={i} className={`drop-card reveal reveal-delay-${Math.min(i+1,4)}`}><div className="drop-card-bg" style={{background:item.bg}}/><div className="drop-card-overlay"/><div className="drop-card-content"><div className="drop-card-name">{item.name}</div><div className="drop-card-hook">{item.hook}</div><div className="drop-card-cta">Order →</div></div></div>))}</div></section>
-      <section className="manifesto"><div className="manifesto-left reveal"><div className="manifesto-quote">A late-night altar for flavor.</div></div><div className="manifesto-right"><p className="reveal reveal-delay-1">Angel Wings is built for the people who do not crave average. It is crisp, heat, sauce, texture, and energy wrapped in a premium visual identity.</p><p className="reveal reveal-delay-2">From solo runs to group orders, game nights to after-hours linkups — Angel Wings is designed to feel bigger than a meal. It is the moment people talk about after the box is empty.</p><p className="reveal reveal-delay-3" style={{color:'var(--amber)',fontStyle:'italic',fontFamily:'var(--font-display)'}}>Wings Worth Worship.</p></div></section>
-      <section className="flavors" id="flavors"><div className="section-label reveal">Flavor Universe</div><h2 className="section-title reveal reveal-delay-1">Enter the vault.</h2><div className="flavors-row reveal reveal-delay-2">{flavors.map((f,i)=>(<div key={i} className="flavor-chip">{f.name} <span className="heat-badge">{f.heat}</span></div>))}</div></section>
-      <section className="lifestyle"><div className="section-label reveal">The Culture</div><h2 className="section-title reveal reveal-delay-1">Built for the after-hours.</h2><div className="lifestyle-grid">{[{text:'Built for nights that run late.',bg:"url('/images/takeout-car.jpg') center/cover"},{text:'Built for the group chat pull-up.',bg:"url('/images/halo-box-tray.jpg') center/cover"},{text:'Built for the after-hours crowd.',bg:"url('/images/hero-wings-neon.jpg') center/cover"},{text:'Studio sessions. Game nights. Victory laps.',bg:"url('/images/branded-cup.jpg') center/cover"},{text:'Branded. Premium. Unmatched.',bg:"url('/images/brand-pattern.jpg') center/cover"}].map((s,i)=>(<div key={i} className={`lifestyle-cell reveal reveal-delay-${Math.min(i+1,4)}`}><div className="lifestyle-cell-bg" style={{background:s.bg}}/><div className="lifestyle-cell-overlay"/><div className="lifestyle-cell-text">{s.text}</div></div>))}</div></section>
-      <section className="catering" id="catering"><div className="section-label reveal">Catering & Group Orders</div><h2 className="section-title reveal reveal-delay-1">Feed the whole table.</h2><p className="catering-body reveal reveal-delay-2">From private events to office drops and large-format nights, Angel Wings catering is built for groups that want heat, speed, and branded presentation that feels elevated.</p><a href="#" className="btn-primary reveal reveal-delay-3"><span>Start Catering Order</span></a></section>
-      <section className="vip" id="vip"><div><div className="section-label reveal">Rewards & VIP</div><h2 className="section-title reveal reveal-delay-1">Unlock drops, deals, and first access.</h2><div className="vip-perks">{perks.map((p,i)=>(<div key={i} className={`vip-perk reveal reveal-delay-${i+2}`}><div className="vip-perk-title">{p.title}</div><div className="vip-perk-desc">{p.desc}</div></div>))}</div></div><div className="reveal reveal-delay-2" style={{display:'flex',flexDirection:'column',gap:'16px'}}><input className="vip-input" type="text" placeholder="Your name"/><input className="vip-input" type="email" placeholder="Email address"/><input className="vip-input" type="tel" placeholder="Phone (for SMS drops)"/><a href="#" className="btn-primary" style={{textAlign:'center',justifyContent:'center'}}><span>Join the VIP</span></a></div></section>
-      <footer><div><div className="footer-brand">Angel <span>Wings</span></div><p className="footer-tagline">Heaven Sent. Sinfully Good.<br/>A Casper Group brand.</p></div><div className="footer-col"><div className="footer-col-title">Order</div><a href="#">Menu</a><a href="#">Order Now</a><a href="#">Catering</a><a href="#">Group Orders</a></div><div className="footer-col"><div className="footer-col-title">Discover</div><a href="#">Flavors</a><a href="#">Locations</a><a href="#">Rewards</a><a href="#">About</a></div><div className="footer-col"><div className="footer-col-title">Connect</div><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">Twitter</a><a href="#">Franchise</a></div></footer>
-      <div className="footer-bottom"><span>© 2026 Angel Wings. All rights reserved.</span><span style={{fontSize:'10px',letterSpacing:'0.2em',textTransform:'uppercase' as const}}>A <a href="#">Casper Group</a> Brand</span></div>
+      {/* INTRO OVERLAY */}
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: phase < 3 ? 10000 : -1,
+        background: C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        opacity: phase >= 3 ? 0 : 1, transition: 'opacity 0.8s cubic-bezier(0.16,1,0.3,1)',
+        pointerEvents: phase >= 3 ? 'none' : 'all'
+      }}>
+        <div style={{
+          width: phase >= 2 ? '100vw' : 'clamp(260px,38vw,460px)',
+          height: phase >= 2 ? '100vh' : 'clamp(180px,28vh,320px)',
+          overflow: 'hidden', transition: 'all 1s cubic-bezier(0.16,1,0.3,1)', position: 'relative'
+        }}>
+          <video autoPlay muted loop playsInline style={{
+            width: '100%', height: '100%', objectFit: 'cover',
+            filter: 'brightness(0.6) contrast(1.2) saturate(0.8)'
+          }}><source src="/videos/hero.mp4" type="video/mp4" /></video>
+          <div style={{
+            position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            opacity: phase >= 2 ? 0 : 1, transition: 'opacity 0.5s ease'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: '8px', fontWeight: 600, letterSpacing: '0.6em', textTransform: 'uppercase', color: C.amber, marginBottom: '14px' }}>A Casper Group Brand</div>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(24px,4vw,40px)', fontWeight: 900, letterSpacing: '0.06em', color: C.cream }}>Angel <span style={{ color: C.amber }}>Wings</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* HERO — video becomes BG */}
+      <section
+        onMouseMove={e => setMouse({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight })}
+        style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}
+      >
+        <video autoPlay muted loop playsInline style={{
+          position: 'absolute', inset: '-5%', width: '110%', height: '110%', objectFit: 'cover',
+          filter: 'brightness(0.2) contrast(1.2) saturate(0.5)',
+          transform: `scale(1.02) translate(${(mouse.x - 0.5) * -10}px,${(mouse.y - 0.5) * -10}px)`,
+          transition: 'transform 0.3s ease'
+        }}><source src="/videos/hero.mp4" type="video/mp4" /></video>
+
+        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg,${C.dark}00 0%,${C.dark}99 60%,${C.dark} 100%)` }} />
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at ${mouse.x * 100}% ${mouse.y * 100}%,${C.crimsonGlow},transparent 50%)` }} />
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.04, pointerEvents: 'none', mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+        <div style={{ position: 'relative', zIndex: 2, padding: '160px clamp(32px,8vw,100px) 120px', maxWidth: 1300, margin: '0 auto', width: '100%' }}>
+          <div style={{ opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(60px)', transition: 'all 1.4s cubic-bezier(0.16,1,0.3,1) 0.2s' }}>
+            <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: '9px', fontWeight: 600, letterSpacing: '0.6em', textTransform: 'uppercase', color: C.amber, marginBottom: 28, display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ width: 32, height: 1, background: C.amber, display: 'inline-block' }} />
+              Crisp Texture · Bold Sauce · Late-Night Obsession
+            </div>
+            <h1 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(60px,12vw,180px)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.03em', color: C.cream, margin: 0 }}>
+              <span style={{ display: 'block', opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(80px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.4s' }}>Heaven</span>
+              <span style={{ display: 'block', fontStyle: 'italic', color: C.crimson, opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(80px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s', textShadow: `0 0 100px ${C.crimson}20` }}>Sent.</span>
+            </h1>
+            <div style={{ marginTop: 'clamp(28px,4vw,52px)', marginLeft: 'clamp(0px,8vw,120px)', maxWidth: 480 }}>
+              <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(14px,1.2vw,17px)', fontWeight: 300, lineHeight: 1.85, color: C.muted, marginBottom: 40 }}>Angel Wings turns hunger into a full experience. Crisp texture. Bold sauce. Heat that hits different. This is the late-night altar for flavor.</p>
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '16px 44px', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 40px ${C.amber}40` }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>Order Now</button>
+                <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 400, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.cream, background: 'transparent', border: `1px solid ${C.dim}`, padding: '16px 36px', cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => { e.currentTarget.style.borderColor = C.amber; e.currentTarget.style.color = C.amber }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,240,232,0.1)'; e.currentTarget.style.color = C.cream }}>Explore Menu</button>
+                <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 400, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.cream, background: 'transparent', border: `1px solid ${C.dim}`, padding: '16px 36px', cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => { e.currentTarget.style.borderColor = C.amber; e.currentTarget.style.color = C.amber }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,240,232,0.1)'; e.currentTarget.style.color = C.cream }}>Book Catering</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
+  )
+}
+
+function Nav() {
+  const [s, setS] = useState(false)
+  useEffect(() => { const fn = () => setS(window.scrollY > 80); window.addEventListener('scroll', fn, { passive: true }); return () => window.removeEventListener('scroll', fn) }, [])
+  return (
+    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, padding: s ? '10px clamp(24px,6vw,80px)' : '24px clamp(24px,6vw,80px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: s ? `${C.base}f0` : 'transparent', backdropFilter: s ? 'blur(32px) saturate(1.3)' : 'none', borderBottom: s ? `1px solid ${C.border}` : 'none', transition: 'all 0.5s cubic-bezier(0.16,1,0.3,1)' }}>
+      <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontWeight: 700, color: C.cream, letterSpacing: '0.06em' }}>Angel <span style={{ color: C.amber }}>Wings</span></div>
+      <div style={{ display: 'flex', gap: 'clamp(14px,2.5vw,36px)', alignItems: 'center' }}>
+        {['Menu', 'Flavors', 'Catering', 'Rewards'].map(n => (<a key={n} href={`#${n.toLowerCase()}`} className="nav-link-hide" style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase', color: C.muted, textDecoration: 'none', transition: 'color 0.3s' }} onMouseEnter={e => (e.target as HTMLElement).style.color = C.cream} onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(245,240,232,0.4)'}>{n}</a>))}
+        <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '9px 24px', cursor: 'pointer' }}>Order Now</button>
+      </div>
+    </nav>
+  )
+}
+
+/* ─── FEATURED DROPS (MENU) ─── */
+function Drops() {
+  return (
+    <section id="menu" style={{ background: C.base, padding: '120px clamp(32px,8vw,100px)', borderTop: `1px solid ${C.amberDim}` }}>
+      <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Featured Drops</div>
+        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.02em', color: C.cream, marginBottom: 64 }}>The Collection.</h2></Rev>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
+        {drops.map((item, i) => (
+          <Rev key={i} d={0.06 * i}>
+            <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', cursor: 'pointer', background: '#111' }}
+              onMouseEnter={e => { const bg = e.currentTarget.querySelector('.drop-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.08)' }}
+              onMouseLeave={e => { const bg = e.currentTarget.querySelector('.drop-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)' }}>
+              <div className="drop-bg" style={{ position: 'absolute', inset: 0, background: item.bg, transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 40%,rgba(10,10,10,0.9) 100%)' }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 32 }}>
+                <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, fontWeight: 700, color: C.cream, marginBottom: 6 }}>{item.name}</div>
+                <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 12, color: C.muted, letterSpacing: '0.1em', marginBottom: 16 }}>{item.hook}</div>
+                <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: C.amber, opacity: 0 }}>Order →</div>
+              </div>
+            </div>
+          </Rev>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ─── MANIFESTO ─── */
+function Manifesto() {
+  return (
+    <section style={{ padding: '160px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base }}>
+      <Rev><div>
+        <div style={{ width: 60, height: 2, background: C.crimson, marginBottom: 40 }} />
+        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.05, color: C.cream }}>A late-night altar for flavor.</h2>
+      </div></Rev>
+      <div>
+        <Rev d={0.1}><p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(15px,1.4vw,18px)', fontWeight: 300, lineHeight: 1.9, color: C.muted, marginBottom: 24 }}>Angel Wings is built for the people who do not crave average. It is crisp, heat, sauce, texture, and energy wrapped in a premium visual identity.</p></Rev>
+        <Rev d={0.2}><p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(15px,1.4vw,18px)', fontWeight: 300, lineHeight: 1.9, color: C.muted, marginBottom: 24 }}>From solo runs to group orders, game nights to after-hours linkups — Angel Wings is designed to feel bigger than a meal.</p></Rev>
+        <Rev d={0.3}><p style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontStyle: 'italic', color: C.amber }}>Wings Worth Worship.</p></Rev>
+      </div>
+    </section>
+  )
+}
+
+/* ─── FLAVOR VAULT ─── */
+function FlavorVault() {
+  const [hover, setHover] = useState<number | null>(null)
+  return (
+    <section id="flavors" style={{ padding: '120px clamp(32px,8vw,100px)', background: C.dark }}>
+      <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Flavor Universe</div>
+        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Enter the vault.</h2></Rev>
+      <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        {flavors.map((f, i) => (
+          <Rev key={i} d={0.03 * i}>
+            <div onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
+              style={{ padding: '22px 36px', border: `1px solid ${hover === i ? C.amber : C.border}`, background: hover === i ? C.amberDim : 'transparent', fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16, fontWeight: 700, letterSpacing: '0.05em', color: C.cream, cursor: 'pointer', transition: 'all 0.5s cubic-bezier(0.16,1,0.3,1)', whiteSpace: 'nowrap', position: 'relative' }}>
+              {f.name} <span style={{ fontSize: 10, color: C.crimson, marginLeft: 12, letterSpacing: '0.1em' }}>{f.heat}</span>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: C.amber, transform: hover === i ? 'scaleX(1)' : 'scaleX(0)', transformOrigin: 'left', transition: 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' }} />
+            </div>
+          </Rev>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ─── LIFESTYLE ─── */
+function Lifestyle() {
+  const scenes = [
+    { text: 'Built for nights that run late.', bg: "url('/images/takeout-car.jpg') center/cover" },
+    { text: 'Built for the group chat pull-up.', bg: "url('/images/halo-box-tray.jpg') center/cover" },
+    { text: 'Built for the after-hours crowd.', bg: "url('/images/hero-wings-neon.jpg') center/cover" },
+    { text: 'Studio sessions. Game nights.', bg: "url('/images/branded-cup.jpg') center/cover" },
+    { text: 'Branded. Premium. Unmatched.', bg: "url('/images/brand-pattern.jpg') center/cover" },
+  ]
+  return (
+    <section style={{ padding: '120px clamp(32px,8vw,100px)', background: C.base }}>
+      <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>The Culture</div>
+        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Built for the after-hours.</h2></Rev>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gridTemplateRows: '300px 300px', gap: 2 }}>
+        {scenes.map((s, i) => (
+          <Rev key={i} d={0.06 * i}>
+            <div style={{ position: 'relative', overflow: 'hidden', height: '100%', gridRow: i === 0 ? '1/3' : undefined, cursor: 'pointer' }}
+              onMouseEnter={e => { const bg = e.currentTarget.querySelector('.life-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.05)' }}
+              onMouseLeave={e => { const bg = e.currentTarget.querySelector('.life-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)' }}>
+              <div className="life-bg" style={{ position: 'absolute', inset: 0, background: s.bg, transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 50%,rgba(10,10,10,0.7) 100%)' }} />
+              <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24, fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontStyle: 'italic', color: 'rgba(245,240,232,0.7)' }}>{s.text}</div>
+            </div>
+          </Rev>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ─── CATERING ─── */
+function Catering() {
+  return (
+    <section id="catering" style={{ padding: '160px clamp(32px,8vw,100px)', textAlign: 'center', background: C.dark, position: 'relative' }}>
+      <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 50% 50%,${C.crimsonGlow},transparent 70%)` }} />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Catering & Group Orders</div>
+          <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, margin: '0 auto 24px', maxWidth: 700 }}>Feed the whole table.</h2>
+          <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(15px,1.4vw,18px)', fontWeight: 300, color: C.muted, maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.85 }}>From private events to office drops and large-format nights, Angel Wings catering is built for groups that want heat, speed, and branded presentation that feels elevated.</p>
+          <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '16px 48px', cursor: 'pointer', transition: 'all 0.4s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 40px ${C.amber}40` }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>Start Catering Order</button></Rev>
+      </div>
+    </section>
+  )
+}
+
+/* ─── VIP / REWARDS ─── */
+function VIP() {
+  return (
+    <section id="rewards" style={{ padding: '120px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, borderTop: `1px solid ${C.border}` }}>
+      <div>
+        <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Rewards & VIP</div>
+          <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 36 }}>Unlock drops, deals, and first access.</h2></Rev>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          {perks.map((p, i) => (<Rev key={i} d={0.06 * i}><div style={{ padding: 24, border: `1px solid ${C.border}`, background: C.amberDim }}>
+            <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700, color: C.amber, marginBottom: 6 }}>{p.title}</div>
+            <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 12, fontWeight: 300, color: C.muted, lineHeight: 1.6 }}>{p.desc}</div>
+          </div></Rev>))}
+        </div>
+      </div>
+      <Rev d={0.1}><div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {['Your name', 'Email address', 'Phone (for SMS drops)'].map(ph => (
+          <input key={ph} type="text" placeholder={ph} style={{ padding: '18px 24px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`, color: C.cream, fontFamily: "'DM Sans',system-ui", fontSize: 14, outline: 'none', transition: 'border-color 0.3s' }} onFocus={e => e.currentTarget.style.borderColor = C.amber} onBlur={e => e.currentTarget.style.borderColor = 'rgba(245,240,232,0.05)'} />
+        ))}
+        <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '18px 44px', cursor: 'pointer', textAlign: 'center' }}>Join the VIP</button>
+      </div></Rev>
+    </section>
+  )
+}
+
+/* ─── FOOTER ─── */
+function Footer() {
+  return (
+    <>
+      <footer style={{ background: C.dark, padding: '80px clamp(32px,8vw,100px) 40px', borderTop: `1px solid ${C.border}`, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48 }}>
+        <div>
+          <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 24, fontWeight: 700, color: C.cream, letterSpacing: '0.1em', marginBottom: 16 }}>Angel <span style={{ color: C.amber }}>Wings</span></div>
+          <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 13, fontWeight: 300, color: C.muted, fontStyle: 'italic', lineHeight: 1.6 }}>Heaven Sent. Sinfully Good.<br />A Casper Group brand.</p>
+        </div>
+        {[{ h: 'Order', l: ['Menu', 'Order Now', 'Catering', 'Group Orders'] }, { h: 'Discover', l: ['Flavors', 'Locations', 'Rewards', 'About'] }, { h: 'Connect', l: ['Instagram', 'TikTok', 'Twitter', 'Franchise'] }].map(col => (
+          <div key={col.h}>
+            <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 8, fontWeight: 700, letterSpacing: '0.45em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>{col.h}</div>
+            {col.l.map(item => (<a key={item} href="#" style={{ display: 'block', color: C.muted, textDecoration: 'none', fontFamily: "'DM Sans',system-ui", fontSize: 13, fontWeight: 300, marginBottom: 12, transition: 'color 0.3s' }} onMouseEnter={e => (e.target as HTMLElement).style.color = C.cream} onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(245,240,232,0.4)'}>{item}</a>))}
+          </div>
+        ))}
+      </footer>
+      <div style={{ background: C.dark, padding: '32px clamp(32px,8vw,100px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.border}`, fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 300, color: 'rgba(245,240,232,0.15)' }}>
+        <span>© 2026 Angel Wings. All rights reserved.</span>
+        <span style={{ letterSpacing: '0.2em', textTransform: 'uppercase' }}>A Casper Group Brand</span>
+      </div>
+    </>
+  )
+}
+
+export default function AngelWingsV2() {
+  return (
+    <div style={{ background: C.base, overflowX: 'hidden' }}>
+      <style>{`@media(max-width:768px){.nav-link-hide{display:none}}`}</style>
+      <Nav />
+      <VideoIntroHero />
+      <Drops />
+      <Manifesto />
+      <FlavorVault />
+      <Lifestyle />
+      <Catering />
+      <VIP />
+      <Footer />
+    </div>
   )
 }
