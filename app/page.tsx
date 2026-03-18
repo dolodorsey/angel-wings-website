@@ -64,8 +64,8 @@ function VideoIntroHero() {
         pointerEvents: phase >= 3 ? 'none' : 'all'
       }}>
         <div style={{
-          width: phase >= 2 ? '100vw' : 'clamp(260px,38vw,460px)',
-          height: phase >= 2 ? '100vh' : 'clamp(180px,28vh,320px)',
+          width: '100vw',
+          height: '100vh',
           overflow: 'hidden', transition: 'all 1s cubic-bezier(0.16,1,0.3,1)', position: 'relative'
         }}>
           <video autoPlay muted loop playsInline style={{
