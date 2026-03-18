@@ -106,6 +106,7 @@ function VideoIntroHero() {
               <span style={{ width: 32, height: 1, background: C.amber, display: 'inline-block' }} />
               Crisp Texture · Bold Sauce · Late-Night Obsession
             </div>
+            <img src="/images/logo.png" alt="Angel Wings" style={{ height: 'clamp(80px,14vw,160px)', width: 'auto', marginBottom: 28, opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(40px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s' }} />
             <h1 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(60px,12vw,180px)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.03em', color: C.cream, margin: 0 }}>
               <span style={{ display: 'block', opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(80px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.4s' }}>Heaven</span>
               <span style={{ display: 'block', fontStyle: 'italic', color: C.crimson, opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(80px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s', textShadow: `0 0 100px ${C.crimson}20` }}>Sent.</span>
@@ -130,7 +131,7 @@ function Nav() {
   useEffect(() => { const fn = () => setS(window.scrollY > 80); window.addEventListener('scroll', fn, { passive: true }); return () => window.removeEventListener('scroll', fn) }, [])
   return (
     <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, padding: s ? '10px clamp(24px,6vw,80px)' : '24px clamp(24px,6vw,80px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: s ? `${C.base}f0` : 'transparent', backdropFilter: s ? 'blur(32px) saturate(1.3)' : 'none', borderBottom: s ? `1px solid ${C.border}` : 'none', transition: 'all 0.5s cubic-bezier(0.16,1,0.3,1)' }}>
-      <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontWeight: 700, color: C.cream, letterSpacing: '0.06em' }}>Angel <span style={{ color: C.amber }}>Wings</span></div>
+      <div style={{ display: 'flex', alignItems: 'center' }}><img src="/images/logo.png" alt="Angel Wings" style={{ height: s ? 28 : 44, width: 'auto', transition: 'height 0.4s ease' }} /></div>
       <div style={{ display: 'flex', gap: 'clamp(14px,2.5vw,36px)', alignItems: 'center' }}>
         {['Menu', 'Flavors', 'Catering', 'Rewards'].map(n => (<a key={n} href={`#${n.toLowerCase()}`} className="nav-link-hide" style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase', color: C.muted, textDecoration: 'none', transition: 'color 0.3s' }} onMouseEnter={e => (e.target as HTMLElement).style.color = C.cream} onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(245,240,232,0.4)'}>{n}</a>))}
         <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '9px 24px', cursor: 'pointer' }}>Order Now</button>
@@ -142,7 +143,8 @@ function Nav() {
 /* ─── FEATURED DROPS (MENU) ─── */
 function Drops() {
   return (
-    <section id="menu" style={{ background: C.base, padding: '120px clamp(32px,8vw,100px)', borderTop: `1px solid ${C.amberDim}` }}>
+    <section id="menu" style={{ background: C.base, padding: '120px clamp(32px,8vw,100px)', borderTop: `1px solid ${C.amberDim}`, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}><img src="/images/wings-halo-plate.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.25) saturate(0.4)' }} /></div>
       <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Featured Drops</div>
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.02em', color: C.cream, marginBottom: 64 }}>The Collection.</h2></Rev>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
@@ -169,7 +171,8 @@ function Drops() {
 /* ─── MANIFESTO ─── */
 function Manifesto() {
   return (
-    <section style={{ padding: '160px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base }}>
+    <section style={{ padding: '160px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.05, pointerEvents: 'none' }}><img src="/images/brand-pattern.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.25) saturate(0.4)' }} /></div>
       <Rev><div>
         <div style={{ width: 60, height: 2, background: C.crimson, marginBottom: 40 }} />
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.05, color: C.cream }}>A late-night altar for flavor.</h2>
@@ -187,7 +190,8 @@ function Manifesto() {
 function FlavorVault() {
   const [hover, setHover] = useState<number | null>(null)
   return (
-    <section id="flavors" style={{ padding: '120px clamp(32px,8vw,100px)', background: C.dark }}>
+    <section id="flavors" style={{ padding: '120px clamp(32px,8vw,100px)', background: C.dark, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}><img src="/images/sauce-vault.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
       <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Flavor Universe</div>
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Enter the vault.</h2></Rev>
       <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -215,13 +219,14 @@ function Lifestyle() {
     { text: 'Branded. Premium. Unmatched.', bg: "url('/images/brand-pattern.jpg') center/cover" },
   ]
   return (
-    <section style={{ padding: '120px clamp(32px,8vw,100px)', background: C.base }}>
+    <section style={{ padding: '120px clamp(32px,8vw,100px)', background: C.base, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.05, pointerEvents: 'none' }}><img src="/images/hero-wings-neon.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
       <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>The Culture</div>
         <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Built for the after-hours.</h2></Rev>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gridTemplateRows: '300px 300px', gap: 2 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
         {scenes.map((s, i) => (
           <Rev key={i} d={0.06 * i}>
-            <div style={{ position: 'relative', overflow: 'hidden', height: '100%', gridRow: i === 0 ? '1/3' : undefined, cursor: 'pointer' }}
+            <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3', cursor: 'pointer' }}
               onMouseEnter={e => { const bg = e.currentTarget.querySelector('.life-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.05)' }}
               onMouseLeave={e => { const bg = e.currentTarget.querySelector('.life-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)' }}>
               <div className="life-bg" style={{ position: 'absolute', inset: 0, background: s.bg, transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)' }} />
@@ -238,7 +243,8 @@ function Lifestyle() {
 /* ─── CATERING ─── */
 function Catering() {
   return (
-    <section id="catering" style={{ padding: '160px clamp(32px,8vw,100px)', textAlign: 'center', background: C.dark, position: 'relative' }}>
+    <section id="catering" style={{ padding: '160px clamp(32px,8vw,100px)', textAlign: 'center', background: C.dark, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}><img src="/images/loudini-mascot.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
       <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 50% 50%,${C.crimsonGlow},transparent 70%)` }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Catering & Group Orders</div>
@@ -253,7 +259,8 @@ function Catering() {
 /* ─── VIP / REWARDS ─── */
 function VIP() {
   return (
-    <section id="rewards" style={{ padding: '120px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, borderTop: `1px solid ${C.border}` }}>
+    <section id="rewards" style={{ padding: '120px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, borderTop: `1px solid ${C.border}`, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.05, pointerEvents: 'none' }}><img src="/images/sauce-pour.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.3)' }} /></div>
       <div>
         <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Rewards & VIP</div>
           <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 36 }}>Unlock drops, deals, and first access.</h2></Rev>
@@ -280,7 +287,7 @@ function Footer() {
     <>
       <footer style={{ background: C.dark, padding: '80px clamp(32px,8vw,100px) 40px', borderTop: `1px solid ${C.border}`, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48 }}>
         <div>
-          <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 24, fontWeight: 700, color: C.cream, letterSpacing: '0.1em', marginBottom: 16 }}>Angel <span style={{ color: C.amber }}>Wings</span></div>
+          <div><img src="/images/logo.png" alt="Angel Wings" style={{ height: 44, width: 'auto', marginBottom: 16 }} />
           <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 13, fontWeight: 300, color: C.muted, fontStyle: 'italic', lineHeight: 1.6 }}>Heaven Sent. Sinfully Good.<br />A Casper Group brand.</p>
         </div>
         {[{ h: 'Order', l: ['Menu', 'Order Now', 'Catering', 'Group Orders'] }, { h: 'Discover', l: ['Flavors', 'Locations', 'Rewards', 'About'] }, { h: 'Connect', l: ['Instagram', 'TikTok', 'Twitter', 'Franchise'] }].map(col => (
