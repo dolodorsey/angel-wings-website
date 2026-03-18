@@ -287,7 +287,7 @@ function Footer() {
     <>
       <footer style={{ background: C.dark, padding: '80px clamp(32px,8vw,100px) 40px', borderTop: `1px solid ${C.border}`, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48 }}>
         <div>
-          <div><img src="/images/logo.png" alt="Angel Wings" style={{ height: 44, width: 'auto', marginBottom: 16 }} />
+          <div><img src="/images/logo.png" alt="Angel Wings" style={{ height: 44, width: 'auto', marginBottom: 16 }} /></div>
           <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 13, fontWeight: 300, color: C.muted, fontStyle: 'italic', lineHeight: 1.6 }}>Heaven Sent. Sinfully Good.<br />A Casper Group brand.</p>
         </div>
         {[{ h: 'Order', l: ['Menu', 'Order Now', 'Catering', 'Group Orders'] }, { h: 'Discover', l: ['Flavors', 'Locations', 'Rewards', 'About'] }, { h: 'Connect', l: ['Instagram', 'TikTok', 'Twitter', 'Franchise'] }].map(col => (
