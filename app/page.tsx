@@ -1,324 +1,579 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
 
-/* ═══════════════════════════════════════════════════════════════════════
-   ANGEL WINGS — EXTRAORDINARY V2
-   Casper Group sub-brand. Crimson/Amber on deep black.
-   Video intro → hero BG. Late-night heat. Premium wing culture.
-   ═══════════════════════════════════════════════════════════════════════ */
+import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 
-const C = {
-  base: '#0A0A0D', dark: '#060608', surface: '#111114', surface2: '#16161A',
-  crimson: '#8B1A1A', crimsonGlow: 'rgba(139,26,26,0.10)',
-  amber: '#D4A04A', amberLight: '#E8C374', amberDim: 'rgba(212,160,74,0.06)',
-  cream: '#F5F0E8', muted: 'rgba(245,240,232,0.4)', dim: 'rgba(245,240,232,0.1)',
-  border: 'rgba(245,240,232,0.05)',
-}
-
-function useInView(t=0.1){const ref=useRef<HTMLDivElement>(null);const[v,setV]=useState(false);useEffect(()=>{const el=ref.current;if(!el)return;const o=new IntersectionObserver(([e])=>{if(e.isIntersecting){setV(true);o.unobserve(el)}},{threshold:t});o.observe(el);return()=>o.disconnect()},[t]);return[ref,v] as const}
-function Rev({children,d=0,y=48}:{children:React.ReactNode;d?:number;y?:number}){const[ref,v]=useInView();return<div ref={ref} style={{transform:v?'translateY(0)':`translateY(${y}px)`,opacity:v?1:0,transition:`all 1.1s cubic-bezier(0.16,1,0.3,1) ${d}s`}}>{children}</div>}
-
-const drops = [
-  { name: 'Halo Wings', hook: '10pc tossed in our signature glaze', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/wings-halo-plate.jpg') center/cover" },
-  { name: 'Lemon Pepper Ritual', hook: 'ATL-style. Wet. Properly executed.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/lemon-pepper.png') center/cover" },
-  { name: 'The Sauce Vault', hook: 'Six proprietary sauces. Earn your heat level.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/sauce-vault.jpg') center/cover" },
-  { name: 'Wings & Waffles', hook: 'Sweet and heat. The brunch crossover.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/wings-slate.png') center/cover" },
-  { name: 'Loaded Fry Box', hook: 'Fries. Cheese. Sauce. Everything on top.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/halo-box-tray.jpg') center/cover" },
-  { name: 'Late Night Box', hook: 'The 2AM survival kit. Wings + fries + drink.', bg: "linear-gradient(180deg,rgba(10,10,10,0.3),rgba(10,10,10,0.8)),url('/images/branded-cup.jpg') center/cover" },
-]
+const API_URL = 'https://qhgmukwoennurwuvmbhy.supabase.co/functions/v1/angel-wings-intake'
 
 const flavors = [
-  { name: 'Halo Glaze', heat: '●○○○○' }, { name: 'Garlic Parm', heat: '●○○○○' },
-  { name: 'Lemon Pepper Wet', heat: '●●○○○' }, { name: 'Honey Chipotle', heat: '●●●○○' },
-  { name: 'Mango Habanero', heat: '●●●●○' }, { name: 'Reaper\'s Kiss', heat: '●●●●●' },
-  { name: 'BBQ Classic', heat: '●●○○○' }, { name: 'Buffalo OG', heat: '●●●○○' },
-  { name: 'Sweet Chili', heat: '●●○○○' }, { name: 'Jerk Season', heat: '●●●●○' },
+  'Halo Glaze',
+  'Garlic Parm',
+  'Lemon Pepper Wet',
+  'Honey Chipotle',
+  'Mango Habanero',
+  "Reaper's Kiss",
+  'BBQ Classic',
+  'Buffalo OG',
+  'Sweet Chili',
+  'Jerk Season',
 ]
 
-const perks = [
-  { title: 'Free Wings', desc: 'Earn points on every order. Free wings at every tier.' },
-  { title: 'Early Drops', desc: 'First access to new flavors and limited-run sauces.' },
-  { title: 'Birthday Box', desc: 'Free premium box on your birthday. Every year.' },
-  { title: 'VIP Events', desc: 'Invite-only tasting events and sauce vault previews.' },
+const fallbackMenu: MenuItem[] = [
+  { id: '1', slug: 'halo-6', name: '6-Piece Halo Wings', description: 'Crisp wings tossed in one signature flavor.', category: 'wings', price: 10, image_path: '/images/wings-halo-plate.jpg', heat: 1, featured: false, sort_order: 10 },
+  { id: '2', slug: 'halo-10', name: '10-Piece Halo Wings', description: 'The signature basket. Choose up to two flavors.', category: 'wings', price: 16, image_path: '/images/wings-halo-plate.jpg', heat: 2, featured: true, sort_order: 20 },
+  { id: '3', slug: 'halo-20', name: '20-Piece Group Wings', description: 'Built for the group chat pull-up. Up to four flavors.', category: 'wings', price: 30, image_path: '/images/sauce-pour-wings.jpg', heat: 3, featured: true, sort_order: 30 },
+  { id: '4', slug: 'lemon-pepper-10', name: 'Lemon Pepper Wet 10', description: 'ATL-style. Wet. Properly executed.', category: 'wings', price: 17, image_path: '/images/lemon-pepper.png', heat: 2, featured: true, sort_order: 40 },
+  { id: '5', slug: 'shrimp-basket', name: 'Sauced Shrimp Basket', description: 'Seasoned shrimp, fries, house dip, and a drink.', category: 'shrimp', price: 18, image_path: '/images/halo-box-tray.jpg', heat: 2, featured: true, sort_order: 50 },
+  { id: '6', slug: 'wing-shrimp-combo', name: 'Wings + Shrimp Combo', description: 'Six wings, sauced shrimp, fries, and a drink.', category: 'combos', price: 24, image_path: '/images/wings-slate.png', heat: 3, featured: true, sort_order: 60 },
+  { id: '7', slug: 'late-night-box', name: 'Late Night Box', description: 'Ten wings, loaded fries, dipping sauce, and a drink.', category: 'combos', price: 22, image_path: '/images/branded-cup.jpg', heat: 3, featured: true, sort_order: 70 },
+  { id: '8', slug: 'loaded-fries', name: 'Loaded Angel Fries', description: 'Crisp fries layered with cheese, sauce, and seasoning.', category: 'fries', price: 9, image_path: '/images/halo-box-tray.jpg', heat: 1, featured: false, sort_order: 80 },
 ]
 
-/* ─── VIDEO INTRO → HERO BG ─── */
-function VideoIntroHero() {
-  const [phase, setPhase] = useState(0)
-  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
+type MenuItem = {
+  id: string
+  slug: string
+  name: string
+  description: string
+  category: string
+  price: number
+  image_path: string | null
+  heat: number
+  featured: boolean
+  sort_order: number
+}
 
+type CartItem = {
+  slug: string
+  name: string
+  price: number
+  quantity: number
+  flavor: string
+  image: string | null
+}
+
+type ModalName = 'order' | 'catering' | 'vip' | null
+
+type ApiResponse = {
+  ok: boolean
+  error?: string
+  message?: string
+  confirmationCode?: string
+  estimatedSubtotal?: number
+  menu?: MenuItem[]
+}
+
+type ResultState = {
+  title: string
+  body: string
+  code?: string
+} | null
+
+function money(value: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
+}
+
+function scrollToId(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function Modal({ title, eyebrow, onClose, children }: { title: string; eyebrow: string; onClose: () => void; children: ReactNode }) {
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 2000)
-    const t2 = setTimeout(() => setPhase(2), 3000)
-    const t3 = setTimeout(() => setPhase(3), 3600)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-  }, [])
+    const close = (event: KeyboardEvent) => event.key === 'Escape' && onClose()
+    document.addEventListener('keydown', close)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', close)
+      document.body.style.overflow = ''
+    }
+  }, [onClose])
 
   return (
-    <>
-      {/* INTRO OVERLAY */}
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: phase < 3 ? 10000 : -1,
-        background: C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: phase >= 3 ? 0 : 1, transition: 'opacity 0.8s cubic-bezier(0.16,1,0.3,1)',
-        pointerEvents: phase >= 3 ? 'none' : 'all'
-      }}>
-        <div style={{
-          width: '100vw',
-          height: '100vh',
-          overflow: 'hidden', transition: 'all 1s cubic-bezier(0.16,1,0.3,1)', position: 'relative'
-        }}>
-          <video autoPlay muted loop playsInline style={{
-            width: '100%', height: '100%', objectFit: 'cover',
-            filter: 'brightness(0.8) contrast(1.1) saturate(0.9)'
-          }}><source src="/videos/hero.mp4" type="video/mp4" /></video>
-          <div style={{
-            position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            opacity: phase >= 2 ? 0 : 1, transition: 'opacity 0.5s ease'
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: '8px', fontWeight: 600, letterSpacing: '0.6em', textTransform: 'uppercase', color: C.amber, marginBottom: '14px' }}>A Casper Group Brand</div>
-              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(24px,4vw,40px)', fontWeight: 900, letterSpacing: '0.06em', color: C.cream }}>Angel <span style={{ color: C.amber }}>Wings</span></div>
-            </div>
+    <div className="modal-shell" role="dialog" aria-modal="true" aria-label={title}>
+      <button className="modal-backdrop" aria-label="Close dialog" onClick={onClose} />
+      <div className="modal-card">
+        <div className="modal-head">
+          <div>
+            <span className="eyebrow">{eyebrow}</span>
+            <h2>{title}</h2>
           </div>
+          <button className="icon-button" onClick={onClose} aria-label="Close">×</button>
         </div>
+        {children}
       </div>
+    </div>
+  )
+}
 
-      {/* HERO — video becomes BG */}
-      <section
-        onMouseMove={e => setMouse({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight })}
-        style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}
-      >
-        <video autoPlay muted loop playsInline style={{
-          position: 'absolute', inset: '-5%', width: '110%', height: '110%', objectFit: 'cover',
-          filter: 'brightness(0.45) contrast(1.1) saturate(0.7)',
-          transform: `scale(1.02) translate(${(mouse.x - 0.5) * -10}px,${(mouse.y - 0.5) * -10}px)`,
-          transition: 'transform 0.3s ease'
-        }}><source src="/videos/hero.mp4" type="video/mp4" /></video>
+function ResultPanel({ result, onDone }: { result: ResultState; onDone: () => void }) {
+  if (!result) return null
+  return (
+    <div className="result-panel" role="status">
+      <span className="result-mark">✓</span>
+      <span className="eyebrow">Request received</span>
+      <h3>{result.title}</h3>
+      <p>{result.body}</p>
+      {result.code && <div className="confirmation-code">{result.code}</div>}
+      <button className="button button-primary" type="button" onClick={onDone}>Done</button>
+    </div>
+  )
+}
 
-        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg,${C.dark}00 0%,${C.dark}99 60%,${C.dark} 100%)` }} />
-        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at ${mouse.x * 100}% ${mouse.y * 100}%,${C.crimsonGlow},transparent 50%)` }} />
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.14, pointerEvents: 'none', mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+export default function AngelWingsPage() {
+  const [menu, setMenu] = useState<MenuItem[]>(fallbackMenu)
+  const [menuStatus, setMenuStatus] = useState<'loading' | 'live' | 'fallback'>('loading')
+  const [category, setCategory] = useState('all')
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [cartOpen, setCartOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [modal, setModal] = useState<ModalName>(null)
+  const [busy, setBusy] = useState(false)
+  const [formError, setFormError] = useState('')
+  const [result, setResult] = useState<ResultState>(null)
+  const [toast, setToast] = useState('')
 
-        <div style={{ position: 'relative', zIndex: 2, padding: '160px clamp(32px,8vw,100px) 120px', maxWidth: 1300, margin: '0 auto', width: '100%' }}>
-          <div style={{ opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(60px)', transition: 'all 1.4s cubic-bezier(0.16,1,0.3,1) 0.2s' }}>
-            <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: '9px', fontWeight: 600, letterSpacing: '0.6em', textTransform: 'uppercase', color: C.amber, marginBottom: 28, display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ width: 32, height: 1, background: C.amber, display: 'inline-block' }} />
-              Crisp Texture · Bold Sauce · Late-Night Obsession
-            </div>
-            <img src="/images/logo.png" alt="Angel Wings" style={{ height: 'clamp(80px,14vw,160px)', width: 'auto', marginBottom: 28, opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(40px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s', mixBlendMode: 'lighten' }} />
-            <h1 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(60px,12vw,180px)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.03em', color: C.cream, margin: 0 }}>
-              <span style={{ display: 'block', opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(80px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.4s' }}>Heaven</span>
-              <span style={{ display: 'block', fontStyle: 'italic', color: C.crimson, opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(80px)', transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s', textShadow: `0 0 100px ${C.crimson}20` }}>Sent.</span>
-            </h1>
-            <div style={{ marginTop: 'clamp(28px,4vw,52px)', marginLeft: 'clamp(0px,8vw,120px)', maxWidth: 480 }}>
-              <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(14px,1.2vw,17px)', fontWeight: 300, lineHeight: 1.85, color: C.muted, marginBottom: 40 }}>Angel Wings turns hunger into a full experience. Crisp texture. Bold sauce. Heat that hits different. This is the late-night altar for flavor.</p>
-              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '16px 44px', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 40px ${C.amber}40` }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>Order Now</button>
-                <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 400, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.cream, background: 'transparent', border: `1px solid ${C.dim}`, padding: '16px 36px', cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => { e.currentTarget.style.borderColor = C.amber; e.currentTarget.style.color = C.amber }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,240,232,0.1)'; e.currentTarget.style.color = C.cream }}>Explore Menu</button>
-                <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 400, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.cream, background: 'transparent', border: `1px solid ${C.dim}`, padding: '16px 36px', cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => { e.currentTarget.style.borderColor = C.amber; e.currentTarget.style.color = C.amber }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,240,232,0.1)'; e.currentTarget.style.color = C.cream }}>Book Catering</button>
+  useEffect(() => {
+    let active = true
+    fetch(`${API_URL}?resource=menu`)
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Menu unavailable')
+        return response.json() as Promise<ApiResponse>
+      })
+      .then((data) => {
+        if (!active || !data.ok || !Array.isArray(data.menu)) return
+        const normalized = data.menu.map((item) => ({ ...item, price: Number(item.price), heat: Number(item.heat || 0) }))
+        if (normalized.length) {
+          setMenu(normalized)
+          setMenuStatus('live')
+        }
+      })
+      .catch(() => active && setMenuStatus('fallback'))
+      .finally(() => active && setMenuStatus((current) => current === 'loading' ? 'fallback' : current))
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = window.setTimeout(() => setToast(''), 2800)
+    return () => window.clearTimeout(timer)
+  }, [toast])
+
+  const categories = useMemo(() => ['all', ...Array.from(new Set(menu.map((item) => item.category)))], [menu])
+  const visibleMenu = useMemo(() => category === 'all' ? menu : menu.filter((item) => item.category === category), [category, menu])
+  const featured = useMemo(() => menu.filter((item) => item.featured).slice(0, 4), [menu])
+  const cartCount = useMemo(() => cart.reduce((total, item) => total + item.quantity, 0), [cart])
+  const subtotal = useMemo(() => cart.reduce((total, item) => total + item.price * item.quantity, 0), [cart])
+
+  function showToast(message: string) {
+    setToast(message)
+  }
+
+  function addToCart(item: MenuItem, flavor = flavors[0]) {
+    setCart((current) => {
+      const existing = current.find((cartItem) => cartItem.slug === item.slug && cartItem.flavor === flavor)
+      if (existing) return current.map((cartItem) => cartItem === existing ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem)
+      return [...current, { slug: item.slug, name: item.name, price: item.price, quantity: 1, flavor, image: item.image_path }]
+    })
+    showToast(`${item.name} added to your basket.`)
+  }
+
+  function updateQuantity(index: number, next: number) {
+    setCart((current) => current.flatMap((item, itemIndex) => itemIndex === index ? (next > 0 ? [{ ...item, quantity: next }] : []) : [item]))
+  }
+
+  function openOrder() {
+    if (!cart.length) {
+      setCartOpen(false)
+      showToast('Add at least one item before starting an order request.')
+      scrollToId('menu')
+      return
+    }
+    setCartOpen(false)
+    setFormError('')
+    setResult(null)
+    setModal('order')
+  }
+
+  async function callApi(type: 'order' | 'catering' | 'vip', payload: Record<string, unknown>) {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, payload }),
+    })
+    const data = await response.json() as ApiResponse
+    if (!response.ok || !data.ok) throw new Error(data.error || 'Something went wrong. Please try again.')
+    return data
+  }
+
+  async function submitOrder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setBusy(true)
+    setFormError('')
+    const data = new FormData(event.currentTarget)
+    try {
+      const response = await callApi('order', {
+        customerName: data.get('customerName'),
+        email: data.get('email'),
+        phone: data.get('phone'),
+        fulfillment: data.get('fulfillment'),
+        requestedTime: data.get('requestedTime'),
+        deliveryAddress: data.get('deliveryAddress'),
+        notes: data.get('notes'),
+        website: data.get('website'),
+        items: cart.map(({ slug, quantity, flavor }) => ({ slug, quantity, flavor })),
+      })
+      setCart([])
+      setResult({ title: 'Your basket is with the team.', body: response.message || 'The Angel Wings team will contact you to confirm the order.', code: response.confirmationCode })
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to submit the request.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function submitCatering(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setBusy(true)
+    setFormError('')
+    const data = new FormData(event.currentTarget)
+    try {
+      const response = await callApi('catering', {
+        customerName: data.get('customerName'),
+        organization: data.get('organization'),
+        email: data.get('email'),
+        phone: data.get('phone'),
+        eventDate: data.get('eventDate'),
+        eventTime: data.get('eventTime'),
+        guestCount: Number(data.get('guestCount')),
+        eventType: data.get('eventType'),
+        serviceStyle: data.get('serviceStyle'),
+        venueAddress: data.get('venueAddress'),
+        budget: data.get('budget'),
+        notes: data.get('notes'),
+        website: data.get('website'),
+      })
+      setResult({ title: 'Your event is in review.', body: response.message || 'The catering team will follow up with next steps.', code: response.confirmationCode })
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to submit the catering request.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function submitVip(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setBusy(true)
+    setFormError('')
+    const data = new FormData(event.currentTarget)
+    try {
+      const response = await callApi('vip', {
+        customerName: data.get('customerName'),
+        email: data.get('email'),
+        phone: data.get('phone'),
+        birthday: data.get('birthday'),
+        smsOptIn: data.get('smsOptIn') === 'on',
+        emailOptIn: data.get('emailOptIn') === 'on',
+        website: data.get('website'),
+      })
+      setResult({ title: 'Welcome to Angel Wings VIP.', body: response.message || 'You are in for drops, deals, and first access.' })
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to join VIP.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function closeModal() {
+    setModal(null)
+    setResult(null)
+    setFormError('')
+  }
+
+  const today = new Date().toISOString().slice(0, 10)
+
+  return (
+    <main>
+      <div className="announcement">Atlanta launch service · Order requests · Catering · Group orders</div>
+      <header className="site-header">
+        <a className="brand" href="#top" aria-label="Angel Wings home">
+          <img src="/images/logo.png" alt="Angel Wings" />
+        </a>
+        <nav className={mobileOpen ? 'site-nav site-nav-open' : 'site-nav'} aria-label="Main navigation">
+          <a href="#menu" onClick={() => setMobileOpen(false)}>Menu</a>
+          <a href="#flavors" onClick={() => setMobileOpen(false)}>Flavors</a>
+          <a href="#catering" onClick={() => setMobileOpen(false)}>Catering</a>
+          <a href="#locations" onClick={() => setMobileOpen(false)}>Service</a>
+          <button className="nav-text-button" onClick={() => { setModal('vip'); setMobileOpen(false); setResult(null) }}>VIP</button>
+        </nav>
+        <div className="header-actions">
+          <button className="basket-button" onClick={() => setCartOpen(true)} aria-label={`Open basket with ${cartCount} items`}>
+            Basket <span>{cartCount}</span>
+          </button>
+          <button className="menu-toggle" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">☰</button>
+        </div>
+      </header>
+
+      <section className="hero" id="top">
+        <video autoPlay muted loop playsInline poster="/images/hero-wings-neon.jpg">
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
+        <div className="hero-scrim" />
+        <div className="grain" />
+        <div className="hero-content">
+          <span className="eyebrow">A Casper Group Brand</span>
+          <p className="hero-kicker">Wings. Shrimps. Fries. Respect the Basket.</p>
+          <h1>Heaven <em>Sent.</em></h1>
+          <p className="hero-copy">Crisp texture. Bold sauce. Late-night energy. Angel Wings turns the basket into the main event.</p>
+          <div className="hero-actions">
+            <button className="button button-primary" onClick={() => scrollToId('menu')}>Build Your Basket</button>
+            <button className="button button-secondary" onClick={() => { setModal('catering'); setResult(null); setFormError('') }}>Book Catering</button>
+          </div>
+          <p className="microcopy">Online requests are reviewed by the team before final confirmation and payment.</p>
+        </div>
+        <div className="hero-stats" aria-label="Angel Wings highlights">
+          <div><strong>10</strong><span>Signature flavors</span></div>
+          <div><strong>3</strong><span>Basket pillars</span></div>
+          <div><strong>Late</strong><span>Night energy</span></div>
+        </div>
+      </section>
+
+      <section className="section featured-section" aria-labelledby="featured-heading">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Featured baskets</span>
+            <h2 id="featured-heading">Start with the heavy hitters.</h2>
+          </div>
+          <button className="text-link" onClick={() => scrollToId('menu')}>View full menu →</button>
+        </div>
+        <div className="featured-grid">
+          {featured.map((item) => (
+            <article className="featured-card" key={item.slug}>
+              <img src={item.image_path || '/images/wings-halo-plate.jpg'} alt={item.name} />
+              <div className="featured-overlay" />
+              <div className="featured-content">
+                <span>{item.category}</span>
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+                <div className="card-row">
+                  <strong>{money(item.price)}</strong>
+                  <button onClick={() => addToCart(item)}>Add +</button>
+                </div>
               </div>
-            </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="statement-section">
+        <div className="statement-image"><img src="/images/sauce-pour.jpg" alt="Angel Wings being sauced" /></div>
+        <div className="statement-copy">
+          <span className="eyebrow">The standard</span>
+          <h2>Not fast food.<br /><em>Fast culture.</em></h2>
+          <p>Angel Wings is built for people who do not crave average. Every basket is designed around crunch, sauce coverage, heat, and presentation that survives the ride.</p>
+          <div className="principles">
+            <div><strong>01</strong><span>Crisp first</span></div>
+            <div><strong>02</strong><span>Sauce properly</span></div>
+            <div><strong>03</strong><span>Pack with respect</span></div>
           </div>
         </div>
       </section>
-    </>
-  )
-}
 
-function Nav() {
-  const [s, setS] = useState(false)
-  useEffect(() => { const fn = () => setS(window.scrollY > 80); window.addEventListener('scroll', fn, { passive: true }); return () => window.removeEventListener('scroll', fn) }, [])
-  return (
-    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, padding: s ? '10px clamp(24px,6vw,80px)' : '24px clamp(24px,6vw,80px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: s ? `${C.base}f0` : 'transparent', backdropFilter: s ? 'blur(32px) saturate(1.3)' : 'none', borderBottom: s ? `1px solid ${C.border}` : 'none', transition: 'all 0.5s cubic-bezier(0.16,1,0.3,1)' }}>
-      <div style={{ display: 'flex', alignItems: 'center' }}><img src="/images/logo.png" alt="Angel Wings" style={{ height: s ? 28 : 44, width: 'auto', transition: 'height 0.4s ease', mixBlendMode: 'lighten' }} /></div>
-      <div style={{ display: 'flex', gap: 'clamp(14px,2.5vw,36px)', alignItems: 'center' }}>
-        {['Menu', 'Flavors', 'Catering', 'Rewards'].map(n => (<a key={n} href={`#${n.toLowerCase()}`} className="nav-link-hide" style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase', color: C.muted, textDecoration: 'none', transition: 'color 0.3s' }} onMouseEnter={e => (e.target as HTMLElement).style.color = C.cream} onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(245,240,232,0.4)'}>{n}</a>))}
-        <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '9px 24px', cursor: 'pointer' }}>Order Now</button>
-      </div>
-    </nav>
-  )
-}
-
-/* ─── FEATURED DROPS (MENU) ─── */
-function Drops() {
-  return (
-    <section id="menu" style={{ background: C.base, padding: '120px clamp(32px,8vw,100px)', borderTop: `1px solid ${C.amberDim}`, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }}><img src="/images/wings-halo-plate.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5) saturate(0.6)' }} /></div>
-      <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Featured Drops</div>
-        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.02em', color: C.cream, marginBottom: 64 }}>The Collection.</h2></Rev>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
-        {drops.map((item, i) => (
-          <Rev key={i} d={0.06 * i}>
-            <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', cursor: 'pointer', background: '#111' }}
-              onMouseEnter={e => { const bg = e.currentTarget.querySelector('.drop-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.08)' }}
-              onMouseLeave={e => { const bg = e.currentTarget.querySelector('.drop-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)' }}>
-              <div className="drop-bg" style={{ position: 'absolute', inset: 0, background: item.bg, transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 40%,rgba(10,10,10,0.9) 100%)' }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 32 }}>
-                <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, fontWeight: 700, color: C.cream, marginBottom: 6 }}>{item.name}</div>
-                <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 12, color: C.muted, letterSpacing: '0.1em', marginBottom: 16 }}>{item.hook}</div>
-                <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: C.amber, opacity: 0 }}>Order →</div>
-              </div>
-            </div>
-          </Rev>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-/* ─── MANIFESTO ─── */
-function Manifesto() {
-  return (
-    <section style={{ padding: '160px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none' }}><img src="/images/brand-pattern.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5) saturate(0.6)' }} /></div>
-      <Rev><div>
-        <div style={{ width: 60, height: 2, background: C.crimson, marginBottom: 40 }} />
-        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.05, color: C.cream }}>A late-night altar for flavor.</h2>
-      </div></Rev>
-      <div>
-        <Rev d={0.1}><p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(15px,1.4vw,18px)', fontWeight: 300, lineHeight: 1.9, color: C.muted, marginBottom: 24 }}>Angel Wings is built for the people who do not crave average. It is crisp, heat, sauce, texture, and energy wrapped in a premium visual identity.</p></Rev>
-        <Rev d={0.2}><p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(15px,1.4vw,18px)', fontWeight: 300, lineHeight: 1.9, color: C.muted, marginBottom: 24 }}>From solo runs to group orders, game nights to after-hours linkups — Angel Wings is designed to feel bigger than a meal.</p></Rev>
-        <Rev d={0.3}><p style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontStyle: 'italic', color: C.amber }}>Wings Worth Worship.</p></Rev>
-      </div>
-    </section>
-  )
-}
-
-/* ─── FLAVOR VAULT ─── */
-function FlavorVault() {
-  const [hover, setHover] = useState<number | null>(null)
-  return (
-    <section id="flavors" style={{ padding: '120px clamp(32px,8vw,100px)', background: C.dark, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }}><img src="/images/sauce-vault.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
-      <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Flavor Universe</div>
-        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Enter the vault.</h2></Rev>
-      <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        {flavors.map((f, i) => (
-          <Rev key={i} d={0.03 * i}>
-            <div onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
-              style={{ padding: '22px 36px', border: `1px solid ${hover === i ? C.amber : C.border}`, background: hover === i ? C.amberDim : 'transparent', fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16, fontWeight: 700, letterSpacing: '0.05em', color: C.cream, cursor: 'pointer', transition: 'all 0.5s cubic-bezier(0.16,1,0.3,1)', whiteSpace: 'nowrap', position: 'relative' }}>
-              {f.name} <span style={{ fontSize: 10, color: C.crimson, marginLeft: 12, letterSpacing: '0.1em' }}>{f.heat}</span>
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: C.amber, transform: hover === i ? 'scaleX(1)' : 'scaleX(0)', transformOrigin: 'left', transition: 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' }} />
-            </div>
-          </Rev>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-/* ─── LIFESTYLE ─── */
-function Lifestyle() {
-  const scenes = [
-    { text: 'Built for nights that run late.', bg: "url('/images/takeout-car.jpg') center/cover" },
-    { text: 'Built for the group chat pull-up.', bg: "url('/images/halo-box-tray.jpg') center/cover" },
-    { text: 'Built for the after-hours crowd.', bg: "url('/images/hero-wings-neon.jpg') center/cover" },
-    { text: 'Studio sessions. Game nights.', bg: "url('/images/branded-cup.jpg') center/cover" },
-    { text: 'Branded. Premium. Unmatched.', bg: "url('/images/brand-pattern.jpg') center/cover" },
-    { text: 'Sauced. Tossed. Perfected.', bg: "url('/images/sauce-pour-wings.jpg') center/cover" },
-  ]
-  return (
-    <section style={{ padding: '120px clamp(32px,8vw,100px)', background: C.base, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none' }}><img src="/images/hero-wings-neon.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
-      <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>The Culture</div>
-        <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 52 }}>Built for the after-hours.</h2></Rev>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
-        {scenes.map((s, i) => (
-          <Rev key={i} d={0.06 * i}>
-            <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3', cursor: 'pointer' }}
-              onMouseEnter={e => { const bg = e.currentTarget.querySelector('.life-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.05)' }}
-              onMouseLeave={e => { const bg = e.currentTarget.querySelector('.life-bg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)' }}>
-              <div className="life-bg" style={{ position: 'absolute', inset: 0, background: s.bg, transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 50%,rgba(10,10,10,0.7) 100%)' }} />
-              <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24, fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontStyle: 'italic', color: 'rgba(245,240,232,0.7)' }}>{s.text}</div>
-            </div>
-          </Rev>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-/* ─── CATERING ─── */
-function Catering() {
-  return (
-    <section id="catering" style={{ padding: '160px clamp(32px,8vw,100px)', textAlign: 'center', background: C.dark, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }}><img src="/images/loudini-mascot.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
-      <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 50% 50%,${C.crimsonGlow},transparent 70%)` }} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Catering & Group Orders</div>
-          <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(40px,6vw,80px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, margin: '0 auto 24px', maxWidth: 700 }}>Feed the whole table.</h2>
-          <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 'clamp(15px,1.4vw,18px)', fontWeight: 300, color: C.muted, maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.85 }}>From private events to office drops and large-format nights, Angel Wings catering is built for groups that want heat, speed, and branded presentation that feels elevated.</p>
-          <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '16px 48px', cursor: 'pointer', transition: 'all 0.4s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 40px ${C.amber}40` }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>Start Catering Order</button></Rev>
-      </div>
-    </section>
-  )
-}
-
-/* ─── VIP / REWARDS ─── */
-function VIP() {
-  return (
-    <section id="rewards" style={{ padding: '120px clamp(32px,8vw,100px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: C.base, borderTop: `1px solid ${C.border}`, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none' }}><img src="/images/sauce-pour.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45) saturate(0.5)' }} /></div>
-      <div>
-        <Rev><div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 9, fontWeight: 600, letterSpacing: '0.55em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>Rewards & VIP</div>
-          <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(36px,5vw,64px)', fontWeight: 700, lineHeight: 0.95, color: C.cream, marginBottom: 36 }}>Unlock drops, deals, and first access.</h2></Rev>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          {perks.map((p, i) => (<Rev key={i} d={0.06 * i}><div style={{ padding: 24, border: `1px solid ${C.border}`, background: C.amberDim }}>
-            <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700, color: C.amber, marginBottom: 6 }}>{p.title}</div>
-            <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 12, fontWeight: 300, color: C.muted, lineHeight: 1.6 }}>{p.desc}</div>
-          </div></Rev>))}
-        </div>
-      </div>
-      <Rev d={0.1}><div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {['Your name', 'Email address', 'Phone (for SMS drops)'].map(ph => (
-          <input key={ph} type="text" placeholder={ph} style={{ padding: '18px 24px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`, color: C.cream, fontFamily: "'DM Sans',system-ui", fontSize: 14, outline: 'none', transition: 'border-color 0.3s' }} onFocus={e => e.currentTarget.style.borderColor = C.amber} onBlur={e => e.currentTarget.style.borderColor = 'rgba(245,240,232,0.05)'} />
-        ))}
-        <button style={{ fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dark, background: C.amber, border: 'none', padding: '18px 44px', cursor: 'pointer', textAlign: 'center' }}>Join the VIP</button>
-      </div></Rev>
-    </section>
-  )
-}
-
-/* ─── FOOTER ─── */
-function Footer() {
-  return (
-    <>
-      <footer style={{ background: C.dark, padding: '80px clamp(32px,8vw,100px) 40px', borderTop: `1px solid ${C.border}`, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48 }}>
-        <div>
-          <div><img src="/images/logo.png" alt="Angel Wings" style={{ height: 44, width: 'auto', marginBottom: 16, mixBlendMode: 'lighten' }} /></div>
-          <p style={{ fontFamily: "'DM Sans',system-ui", fontSize: 13, fontWeight: 300, color: C.muted, fontStyle: 'italic', lineHeight: 1.6 }}>Heaven Sent. Sinfully Good.<br />A Casper Group brand.</p>
-        </div>
-        {[{ h: 'Order', l: ['Menu', 'Order Now', 'Catering', 'Group Orders'] }, { h: 'Discover', l: ['Flavors', 'Locations', 'Rewards', 'About'] }, { h: 'Connect', l: ['Instagram', 'TikTok', 'Twitter', 'Franchise'] }].map(col => (
-          <div key={col.h}>
-            <div style={{ fontFamily: "'DM Sans',system-ui", fontSize: 8, fontWeight: 700, letterSpacing: '0.45em', textTransform: 'uppercase', color: C.amber, marginBottom: 20 }}>{col.h}</div>
-            {col.l.map(item => (<a key={item} href="#" style={{ display: 'block', color: C.muted, textDecoration: 'none', fontFamily: "'DM Sans',system-ui", fontSize: 13, fontWeight: 300, marginBottom: 12, transition: 'color 0.3s' }} onMouseEnter={e => (e.target as HTMLElement).style.color = C.cream} onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(245,240,232,0.4)'}>{item}</a>))}
+      <section className="section menu-section" id="menu" aria-labelledby="menu-heading">
+        <div className="section-head menu-head">
+          <div>
+            <span className="eyebrow">The launch menu</span>
+            <h2 id="menu-heading">Build your basket.</h2>
+            <p className="section-note">Estimated launch pricing. The team confirms availability, final total, fulfillment window, and payment after your request.</p>
           </div>
-        ))}
-      </footer>
-      <div style={{ background: C.dark, padding: '32px clamp(32px,8vw,100px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.border}`, fontFamily: "'DM Sans',system-ui", fontSize: 10, fontWeight: 300, color: 'rgba(245,240,232,0.15)' }}>
-        <span>© 2026 Angel Wings. All rights reserved.</span>
-        <span style={{ letterSpacing: '0.2em', textTransform: 'uppercase' }}>A Casper Group Brand</span>
-      </div>
-    </>
-  )
-}
+          <div className="live-badge" data-status={menuStatus}>{menuStatus === 'live' ? 'Live menu' : 'Menu preview'}</div>
+        </div>
+        <div className="category-tabs" role="tablist" aria-label="Menu categories">
+          {categories.map((item) => (
+            <button key={item} className={category === item ? 'active' : ''} onClick={() => setCategory(item)} role="tab" aria-selected={category === item}>
+              {item === 'all' ? 'All' : item}
+            </button>
+          ))}
+        </div>
+        <div className="menu-grid">
+          {visibleMenu.map((item) => (
+            <article className="menu-card" key={item.slug}>
+              <div className="menu-image">
+                <img src={item.image_path || '/images/wings-halo-plate.jpg'} alt={item.name} loading="lazy" />
+                {item.featured && <span>Most ordered</span>}
+              </div>
+              <div className="menu-body">
+                <div className="menu-title-row"><h3>{item.name}</h3><strong>{money(item.price)}</strong></div>
+                <p>{item.description}</p>
+                <div className="heat" aria-label={`${item.heat} out of 5 heat`}>{'●'.repeat(item.heat)}{'○'.repeat(Math.max(0, 5 - item.heat))}</div>
+                <label>
+                  Flavor
+                  <select defaultValue={flavors[Math.min(item.heat, flavors.length - 1)] || flavors[0]} id={`flavor-${item.slug}`}>
+                    {flavors.map((flavor) => <option value={flavor} key={flavor}>{flavor}</option>)}
+                  </select>
+                </label>
+                <button className="button button-card" onClick={() => {
+                  const selector = document.getElementById(`flavor-${item.slug}`) as HTMLSelectElement | null
+                  addToCart(item, selector?.value || flavors[0])
+                }}>Add to Basket</button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
 
-export default function AngelWingsV2() {
-  return (
-    <div style={{ background: C.base, overflowX: 'hidden' }}>
-      <style>{`@media(max-width:768px){.nav-link-hide{display:none}}`}</style>
-      <Nav />
-      <VideoIntroHero />
-      <Drops />
-      <Manifesto />
-      <FlavorVault />
-      <Lifestyle />
-      <Catering />
-      <VIP />
-      <Footer />
-    </div>
+      <section className="flavor-section" id="flavors">
+        <div className="flavor-copy">
+          <span className="eyebrow">The sauce vault</span>
+          <h2>Choose your level.</h2>
+          <p>From clean and buttery to full-send heat, every flavor is built to coat the wing—not drown it.</p>
+        </div>
+        <div className="flavor-list">
+          {flavors.map((flavor, index) => (
+            <div key={flavor}><span>{String(index + 1).padStart(2, '0')}</span><strong>{flavor}</strong><em>{'●'.repeat(Math.min(5, Math.ceil((index + 1) / 2)))}</em></div>
+          ))}
+        </div>
+      </section>
+
+      <section className="catering-section" id="catering">
+        <img src="/images/loudini-mascot.jpg" alt="Loudini the Wing Wizard, Angel Wings mascot" />
+        <div className="catering-overlay" />
+        <div className="catering-content">
+          <span className="eyebrow">Catering & group orders</span>
+          <h2>Feed the whole function.</h2>
+          <p>Office drops. Private events. Game nights. Brand activations. Food-truck service. Tell us the count and the occasion; we will build the basket strategy.</p>
+          <div className="catering-options">
+            <span>Drop-off</span><span>Pickup</span><span>Staffed service</span><span>Food truck</span>
+          </div>
+          <button className="button button-primary" onClick={() => { setModal('catering'); setResult(null); setFormError('') }}>Start Catering Request</button>
+        </div>
+      </section>
+
+      <section className="section service-section" id="locations">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Atlanta launch</span>
+            <h2>Service built around the moment.</h2>
+          </div>
+        </div>
+        <div className="service-grid">
+          <article><span>01</span><h3>Order Requests</h3><p>Build a basket online. The team confirms inventory, timing, final total, and payment instructions.</p><button onClick={() => scrollToId('menu')}>Start a basket →</button></article>
+          <article><span>02</span><h3>Delivery Zones</h3><p>Delivery availability is confirmed based on the active kitchen, event, and service radius.</p><button onClick={() => { setCartOpen(true); showToast('Add your items, then choose delivery during checkout.') }}>Check through basket →</button></article>
+          <article><span>03</span><h3>Events & Catering</h3><p>Large-format wing, shrimp, fry, and combo service for private and public events.</p><button onClick={() => { setModal('catering'); setResult(null) }}>Request catering →</button></article>
+        </div>
+      </section>
+
+      <section className="vip-section" id="rewards">
+        <div>
+          <span className="eyebrow">Angel Wings VIP</span>
+          <h2>First access tastes better.</h2>
+          <p>Join for flavor drops, launch windows, group-order deals, birthday offers, and invitation-only tastings.</p>
+        </div>
+        <button className="button button-primary" onClick={() => { setModal('vip'); setResult(null); setFormError('') }}>Join the VIP</button>
+      </section>
+
+      <footer>
+        <div className="footer-brand">
+          <img src="/images/logo.png" alt="Angel Wings" />
+          <p>Heaven Sent. Sinfully Good.<br />A Casper Group brand.</p>
+        </div>
+        <div><strong>Order</strong><a href="#menu">Menu</a><button onClick={() => setCartOpen(true)}>Basket</button><button onClick={() => { setModal('catering'); setResult(null) }}>Catering</button></div>
+        <div><strong>Discover</strong><a href="#flavors">Flavors</a><a href="#locations">Service</a><button onClick={() => { setModal('vip'); setResult(null) }}>VIP</button></div>
+        <div><strong>Operations</strong><span>Atlanta, Georgia</span><span>Pickup · Delivery · Events</span><span>Final details confirmed by team</span></div>
+      </footer>
+      <div className="legal-bar"><span>© 2026 Angel Wings. All rights reserved.</span><span>A Casper Group Brand</span></div>
+
+      {cartOpen && (
+        <aside className="cart-drawer" aria-label="Your Angel Wings basket">
+          <button className="cart-backdrop" onClick={() => setCartOpen(false)} aria-label="Close basket" />
+          <div className="cart-panel">
+            <div className="cart-head"><div><span className="eyebrow">Your basket</span><h2>{cartCount} item{cartCount === 1 ? '' : 's'}</h2></div><button className="icon-button" onClick={() => setCartOpen(false)}>×</button></div>
+            <div className="cart-items">
+              {!cart.length && <div className="empty-state"><h3>The basket is waiting.</h3><p>Add wings, shrimp, fries, or a combo to begin.</p><button className="button button-secondary" onClick={() => { setCartOpen(false); scrollToId('menu') }}>Browse Menu</button></div>}
+              {cart.map((item, index) => (
+                <div className="cart-item" key={`${item.slug}-${item.flavor}`}>
+                  <img src={item.image || '/images/wings-halo-plate.jpg'} alt="" />
+                  <div><h3>{item.name}</h3><p>{item.flavor}</p><strong>{money(item.price * item.quantity)}</strong></div>
+                  <div className="quantity"><button onClick={() => updateQuantity(index, item.quantity - 1)}>−</button><span>{item.quantity}</span><button onClick={() => updateQuantity(index, item.quantity + 1)}>+</button></div>
+                </div>
+              ))}
+            </div>
+            {!!cart.length && <div className="cart-summary"><div><span>Estimated subtotal</span><strong>{money(subtotal)}</strong></div><p>Taxes, delivery, service fees, availability, and final payment are confirmed by the team.</p><button className="button button-primary" onClick={openOrder}>Continue to Order Request</button><button className="clear-button" onClick={() => setCart([])}>Clear basket</button></div>}
+          </div>
+        </aside>
+      )}
+
+      {modal === 'order' && (
+        <Modal title="Confirm your order request" eyebrow="Angel Wings basket" onClose={closeModal}>
+          {result ? <ResultPanel result={result} onDone={closeModal} /> : (
+            <form className="form" onSubmit={submitOrder}>
+              <div className="form-order-summary">
+                {cart.map((item) => <div key={`${item.slug}-${item.flavor}`}><span>{item.quantity}× {item.name}<small>{item.flavor}</small></span><strong>{money(item.quantity * item.price)}</strong></div>)}
+                <div className="form-total"><span>Estimated subtotal</span><strong>{money(subtotal)}</strong></div>
+              </div>
+              <div className="form-grid two">
+                <label>Full name<input name="customerName" required autoComplete="name" /></label>
+                <label>Phone<input name="phone" required inputMode="tel" autoComplete="tel" /></label>
+                <label>Email<input name="email" type="email" autoComplete="email" /></label>
+                <label>Fulfillment<select name="fulfillment" required defaultValue="pickup"><option value="pickup">Pickup</option><option value="delivery">Delivery request</option><option value="event_pickup">Event pickup</option></select></label>
+                <label>Preferred time<input name="requestedTime" placeholder="Example: Friday, 10:30 PM" /></label>
+                <label>Delivery address<input name="deliveryAddress" autoComplete="street-address" placeholder="Required for delivery" /></label>
+              </div>
+              <label>Order notes<textarea name="notes" rows={3} placeholder="Allergies, access instructions, preferred contact method, or other details" /></label>
+              <input className="honeypot" name="website" tabIndex={-1} autoComplete="off" />
+              <p className="form-disclaimer">Submitting this form creates an order request, not a charged transaction. The team will confirm final price, availability, time, and payment.</p>
+              {formError && <p className="form-error">{formError}</p>}
+              <button className="button button-primary full" disabled={busy}>{busy ? 'Sending Request…' : 'Submit Order Request'}</button>
+            </form>
+          )}
+        </Modal>
+      )}
+
+      {modal === 'catering' && (
+        <Modal title="Build the event basket" eyebrow="Catering request" onClose={closeModal}>
+          {result ? <ResultPanel result={result} onDone={closeModal} /> : (
+            <form className="form" onSubmit={submitCatering}>
+              <div className="form-grid two">
+                <label>Full name<input name="customerName" required autoComplete="name" /></label>
+                <label>Organization<input name="organization" autoComplete="organization" /></label>
+                <label>Email<input name="email" type="email" required autoComplete="email" /></label>
+                <label>Phone<input name="phone" required inputMode="tel" autoComplete="tel" /></label>
+                <label>Event date<input name="eventDate" type="date" min={today} required /></label>
+                <label>Event time<input name="eventTime" type="time" /></label>
+                <label>Guest count<input name="guestCount" type="number" min="10" max="10000" required /></label>
+                <label>Event type<input name="eventType" placeholder="Birthday, corporate, festival…" /></label>
+                <label>Service style<select name="serviceStyle" defaultValue="drop_off"><option value="drop_off">Drop-off</option><option value="pickup">Pickup</option><option value="staffed_service">Staffed service</option><option value="food_truck">Food truck</option><option value="custom">Custom</option></select></label>
+                <label>Budget range<input name="budget" placeholder="$500–$1,000" /></label>
+              </div>
+              <label>Venue address<input name="venueAddress" autoComplete="street-address" /></label>
+              <label>Event details<textarea name="notes" rows={4} placeholder="Menu preferences, venue access, service expectations, dietary needs, and timeline" /></label>
+              <input className="honeypot" name="website" tabIndex={-1} autoComplete="off" />
+              {formError && <p className="form-error">{formError}</p>}
+              <button className="button button-primary full" disabled={busy}>{busy ? 'Sending Request…' : 'Submit Catering Request'}</button>
+            </form>
+          )}
+        </Modal>
+      )}
+
+      {modal === 'vip' && (
+        <Modal title="Join Angel Wings VIP" eyebrow="Drops · deals · first access" onClose={closeModal}>
+          {result ? <ResultPanel result={result} onDone={closeModal} /> : (
+            <form className="form" onSubmit={submitVip}>
+              <div className="form-grid two">
+                <label>Full name<input name="customerName" required autoComplete="name" /></label>
+                <label>Email<input name="email" type="email" required autoComplete="email" /></label>
+                <label>Phone<input name="phone" inputMode="tel" autoComplete="tel" /></label>
+                <label>Birthday<input name="birthday" placeholder="MM/DD" inputMode="numeric" /></label>
+              </div>
+              <label className="check"><input type="checkbox" name="emailOptIn" defaultChecked /><span>Email me flavor drops, offers, and launch windows.</span></label>
+              <label className="check"><input type="checkbox" name="smsOptIn" /><span>Text me limited drops and ordering windows. Message and data rates may apply.</span></label>
+              <input className="honeypot" name="website" tabIndex={-1} autoComplete="off" />
+              {formError && <p className="form-error">{formError}</p>}
+              <button className="button button-primary full" disabled={busy}>{busy ? 'Joining…' : 'Join the VIP'}</button>
+            </form>
+          )}
+        </Modal>
+      )}
+
+      {toast && <div className="toast" role="status">{toast}</div>}
+    </main>
   )
 }
