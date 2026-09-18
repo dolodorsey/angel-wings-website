@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import InstallAppPrompt from './install-app-prompt'
 
 const siteUrl = 'https://iwantangelwings.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: 'Angel Wings',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'Angel Wings', statusBarStyle: 'black-translucent' },
   title: {
     default: 'Angel Wings — Heaven Sent. Sinfully Good.',
     template: '%s | Angel Wings',
@@ -68,7 +71,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>{children}<InstallAppPrompt/></body>
     </html>
   )
 }
